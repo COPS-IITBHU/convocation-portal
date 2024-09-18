@@ -1,101 +1,138 @@
-import Image from "next/image";
+'use client'
+import React, {useState} from "react";
+import {
+  Container,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  Typography,
+} from '@mui/material';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const [formData, setFormData] = useState({
+    name: '',
+    branch: '',
+    rollNo: '',
+    rooms: {},
+    messFood: false,
+  });
+
+  const [availableRooms, setAvailableRooms] = useState([
+    { room: '101', available: true },
+    { room: '102', available: false },
+    { room: '103', available: true },
+  ]);
+
+  const handleChange = (e : any) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleRoomChange = (room: string) => {
+    setFormData({
+      ...formData,
+      rooms: {
+        ...formData.rooms,
+        [room]: !formData.rooms[room],
+      },
+    });
+  };
+
+  const handleSubmit = (e : any) => {
+    e.preventDefault();
+    // Here, you can handle the form submission, like sending the data to the server
+    console.log(formData);
+  };
+
+  return (
+    <div className= "">
+    <Container maxWidth="sm">
+      <Typography variant="h4" component="h1" gutterBottom>
+        Hostel Allotment Form
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        {/* Name Field */}
+        <TextField
+          label="Name"
+          name="name"
+          fullWidth
+          value={formData.name}
+          onChange={handleChange}
+          margin="normal"
+          required
+        />
+
+        {/* Branch Dropdown */}
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel id="branch-label">Branch</InputLabel>
+          <Select
+            labelId="branch-label"
+            name="branch"
+            value={formData.branch}
+            onChange={handleChange}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <MenuItem value="CSE">Computer Science</MenuItem>
+            <MenuItem value="ECE">Electronics</MenuItem>
+            <MenuItem value="ME">Mechanical</MenuItem>
+            <MenuItem value="CE">Civil</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Roll No Field */}
+        <TextField
+          label="Roll Number"
+          name="rollNo"
+          fullWidth
+          value={formData.rollNo}
+          onChange={handleChange}
+          margin="normal"
+          required
+        />
+
+        {/* Available Rooms (Checkboxes) */}
+        <FormGroup>
+          <Typography variant="h6" gutterBottom>
+            Available Rooms
+          </Typography>
+          {availableRooms.map((room) => (
+            <FormControlLabel
+              key={room.room}
+              control={
+                <Checkbox
+                  checked={formData.rooms[room.room] || false}
+                  onChange={() => handleRoomChange(room.room)}
+                  disabled={!room.available}
+                />
+              }
+              label={`Room ${room.room} ${!room.available ? '(Unavailable)' : ''}`}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          ))}
+        </FormGroup>
+
+        {/* Mess Food Checkbox */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.messFood}
+              onChange={(e) => setFormData({ ...formData, messFood: e.target.checked })}
+              name="messFood"
+            />
+          }
+          label="Avail Mess Food"
+        />
+
+        {/* Submit Button */}
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Submit
+        </Button>
+      </form>
+    </Container>
     </div>
   );
 }
