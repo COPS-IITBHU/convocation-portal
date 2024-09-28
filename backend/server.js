@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { locationSchema } = require('./model');
 require('dotenv').config();
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.json());
@@ -52,7 +53,8 @@ app.post('/api/register',async (req, res) => {
 
          room.occupants.push(newAlum);
          await location.save();
-         res.status(201).json({ message: 'Alum registered successfully' });
+         sendRoomAllocationEmail(email, name, roomLocation, roomName);
+         res.status(201).json({ message: 'Alum registered successfully and mail sent successfully' });
       } catch (error) {
          res.status(500).json({ message: 'Could not register alum' });
       }
@@ -93,6 +95,34 @@ app.post('/api/initializelocations', async (req, res) => {
       res.status(500).json({ message: 'Could not initialize locations' });
    }
 });
+
+const transporter = nodemailer.createTransport({
+   service: 'gmail',
+   auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+   },
+});
+
+const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
+   const mailOptions = {
+      from: 'noreply@yourdomain.com',
+      to: email,
+      subject: 'Room Allocation Confirmation',
+      html: `<p>Your room allocation details are:</p>
+               <p>Name: ${name}</p> 
+               <p>Location: ${roomLocation}</p>
+               <p>Room: ${roomName}</p>
+               <p>Thank you for registering with us!</p>`
+   };
+   transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+         console.log(error);
+      } else {
+         console.log('Email sent: ' + info.response);
+      }
+   });
+};
 
 app.listen(5000, () => {
    console.log('Server running on port 5000');
