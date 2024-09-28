@@ -4,6 +4,7 @@ const alumSchema = new mongoose.Schema({
    name: String,
    branch: String,
    rollNumber: String,
+   email: String,
    roomLocation: String,
    roomName: String,
    meal: Boolean,

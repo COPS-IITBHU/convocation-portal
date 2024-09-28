@@ -29,7 +29,7 @@ app.get('/api/available-rooms', async (req, res) => {
 });
 
 app.post('/api/register',async (req, res) => {
-      const {name, branch, rollNumber, roomLocation, roomName, meal} = req.body;
+      const {name, branch, rollNumber, email, roomLocation, roomName, meal} = req.body;
 
       try {
          const location = await locationSchema.findOne({ locationName: roomLocation });
@@ -44,6 +44,7 @@ app.post('/api/register',async (req, res) => {
             name,
             branch,
             rollNumber,
+            email,
             roomLocation,
             roomName,
             meal,
