@@ -96,6 +96,21 @@ app.post('/api/initializelocations', async (req, res) => {
    }
 });
 
+app.get('/api/allrooms', async (req, res) => {
+   try {
+      const locations = await locationSchema.find();
+      const allrooms = locations.map(location => {
+         return {
+            location: location.locationName,
+            rooms: location.rooms
+         };
+      });
+      res.status(200).json(allrooms);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch all rooms' });
+   }
+});
+
 const transporter = nodemailer.createTransport({
    service: 'gmail',
    auth: {
