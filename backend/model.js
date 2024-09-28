@@ -6,7 +6,7 @@ const alumSchema = new mongoose.Schema({
    rollNumber: String,
    roomLocation: String,
    roomName: String,
-   meal: String,
+   meal: Boolean,
 });
 
 const roomSchema = new mongoose.Schema({
@@ -16,12 +16,10 @@ const roomSchema = new mongoose.Schema({
     location: String,
 });
 
-const Locations = mongoose.model('Locations', new mongoose.Schema({
-    location: String,
+const locationSchema = mongoose.model('Locations', new mongoose.Schema({
+    locationName: String,
     rooms: [roomSchema],
 }));
 
-module.exports = mongoose.model('Room', roomSchema);
-module.exports = mongoose.model('Alum', alumSchema);
-module.exports = mongoose.model('Locations', Locations);
+module.exports = { alumSchema, roomSchema, locationSchema };
 

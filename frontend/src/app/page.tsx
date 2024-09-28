@@ -34,7 +34,7 @@ export default function Home() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRoomChange = (room: string) => {
+  const handleRoomChange = (room: any) => {
     setFormData({
       ...formData,
       rooms: {
