@@ -1,138 +1,83 @@
 'use client'
-import React, {useState} from "react";
+import React, { useState } from 'react';
 import {
   Container,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
   Button,
   Typography,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-export default function Home() {
+export default function SignIn() {
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    branch: '',
-    rollNo: '',
-    rooms: {},
-    messFood: false,
-  });
-
-  const [availableRooms, setAvailableRooms] = useState([
-    { room: '101', available: true },
-    { room: '102', available: false },
-    { room: '103', available: true },
-  ]);
-
-  const handleChange = (e : any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
   };
 
-  const handleRoomChange = (room: any) => {
-    setFormData({
-      ...formData,
-      rooms: {
-        ...formData.rooms,
-        [room]: !formData.rooms[room],
-      },
-    });
-  };
-
-  const handleSubmit = (e : any) => {
-    e.preventDefault();
-    // Here, you can handle the form submission, like sending the data to the server
-    console.log(formData);
+  const handleMouseDownPassword = (event: React.MouseEvent) => {
+    event.preventDefault();
   };
 
   return (
-    <div className= "">
-    <Container maxWidth="sm">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Hostel Allotment Form
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        {/* Name Field */}
-        <TextField
-          label="Name"
-          name="name"
-          fullWidth
-          value={formData.name}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
+    <Container
+      maxWidth="xs"
+      className="flex justify-center items-center min-h-screen bg-gray-100"
+    >
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full">
+        <Typography variant="h4" className="text-center mb-6 text-black">
+          Sign In
+        </Typography>
 
-        {/* Branch Dropdown */}
-        <FormControl fullWidth margin="normal" required>
-          <InputLabel id="branch-label">Branch</InputLabel>
-          <Select
-            labelId="branch-label"
-            name="branch"
-            value={formData.branch}
-            onChange={handleChange}
-          >
-            <MenuItem value="CSE">Computer Science</MenuItem>
-            <MenuItem value="ECE">Electronics</MenuItem>
-            <MenuItem value="ME">Mechanical</MenuItem>
-            <MenuItem value="CE">Civil</MenuItem>
-          </Select>
-        </FormControl>
+        <form>
+          <div className="mb-4">
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              variant="outlined"
+              required
+            />
+          </div>
 
-        {/* Roll No Field */}
-        <TextField
-          label="Roll Number"
-          name="rollNo"
-          fullWidth
-          value={formData.rollNo}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
+          <div className="mb-4">
+            <FormControl fullWidth variant="outlined">
+              <InputLabel>Password</InputLabel>
+              <OutlinedInput
+                type={showPassword ? 'text' : 'password'}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Password"
+                required
+              />
+            </FormControl>
+          </div>
 
-        {/* Available Rooms (Checkboxes) */}
-        <FormGroup>
-          <Typography variant="h6" gutterBottom>
-            Available Rooms
+          <div className="mb-4 flex items-center justify-between">
+            <Button variant="contained" color="primary" fullWidth type="submit">
+              Sign In
+            </Button>
+          </div>
+
+          <Typography className="text-center mt-4 text-black">
+            Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
           </Typography>
-          {availableRooms.map((room) => (
-            <FormControlLabel
-              key={room.room}
-              control={
-                <Checkbox
-                  checked={formData.rooms[room.room] || false}
-                  onChange={() => handleRoomChange(room.room)}
-                  disabled={!room.available}
-                />
-              }
-              label={`Room ${room.room} ${!room.available ? '(Unavailable)' : ''}`}
-            />
-          ))}
-        </FormGroup>
-
-        {/* Mess Food Checkbox */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={formData.messFood}
-              onChange={(e) => setFormData({ ...formData, messFood: e.target.checked })}
-              name="messFood"
-            />
-          }
-          label="Avail Mess Food"
-        />
-
-        {/* Submit Button */}
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Submit
-        </Button>
-      </form>
+        </form>
+      </div>
     </Container>
-    </div>
   );
 }

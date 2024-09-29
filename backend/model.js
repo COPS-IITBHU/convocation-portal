@@ -8,6 +8,7 @@ const alumSchema = new mongoose.Schema({
    roomLocation: String,
    roomName: String,
    meal: Boolean,
+   password: String
 });
 
 const roomSchema = new mongoose.Schema({
@@ -22,5 +23,8 @@ const locationSchema = mongoose.model('Locations', new mongoose.Schema({
     rooms: [roomSchema],
 }));
 
-module.exports = { alumSchema, roomSchema, locationSchema };
+const Alum = mongoose.model('Alum' , alumSchema)
+const Room = mongoose.model('Room', roomSchema)
+
+module.exports = { alumSchema, roomSchema, locationSchema, Alum, Room };
 
