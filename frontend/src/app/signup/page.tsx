@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   TextField,
@@ -10,9 +10,12 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
+  Select,
+  MenuItem
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';  // Correct import for Next.js App Router
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +26,16 @@ export default function SignUp() {
     rollNumber: '',
     unhashedPassword: '',
   });
+  const router = useRouter();  // Using the App Router's `useRouter`
+
+  useEffect(() => {
+    // Check if the token exists in the cookies
+    const token = Cookies.get('token');
+    if (token) {
+      // If token exists, redirect to /home
+      router.push('/home');
+    }
+  }, [router]);
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -32,16 +45,17 @@ export default function SignUp() {
     event.preventDefault();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name?: string; value: unknown } }) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name as string]: value,
+    }));
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
@@ -52,13 +66,15 @@ export default function SignUp() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         const token = data.token;
 
-        Cookies.set('token', token, { expires: 7 }); // 7-day expiry
+        // Set the token in cookies with a 7-day expiry
+        Cookies.set('token', token, { expires: 7 });
 
-        console.log('Registration successful');
+        // Redirect to /home upon successful registration
+        router.push('/home');
       } else {
         console.error('Registration failed:', data.message);
       }
@@ -104,18 +120,21 @@ export default function SignUp() {
             />
           </div>
 
-          <div className="mb-4">
-            <TextField
-              label="Branch"
-              type="text"
-              fullWidth
-              variant="outlined"
+          {/* Branch Dropdown */}
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="branch-label">Branch</InputLabel>
+            <Select
+              labelId="branch-label"
               name="branch"
               value={formData.branch}
               onChange={handleChange}
-              required
-            />
-          </div>
+            >
+              <MenuItem value="CSE">Computer Science</MenuItem>
+              <MenuItem value="ECE">Electronics</MenuItem>
+              <MenuItem value="ME">Mechanical</MenuItem>
+              <MenuItem value="CE">Civil</MenuItem>
+            </Select>
+          </FormControl>
 
           <div className="mb-4">
             <TextField

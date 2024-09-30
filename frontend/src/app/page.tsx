@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   TextField,
@@ -13,11 +13,22 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation'; // Import the router
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter(); // Initialize the router
+
+  useEffect(() => {
+    // Check if the token exists in the cookies
+    const token = Cookies.get('token');
+    if (token) {
+      // Redirect to /home if token exists
+      router.push('/home');
+    }
+  }, [router]);
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -46,9 +57,9 @@ export default function SignIn() {
 
       if (response.ok && data.token) {
         Cookies.set('token', data.token, { expires: 7 });
-        console.log('login successful')
+        router.push('/home'); // Redirect to /home on successful login
       } else {
-        console.error('login failed')
+        console.error('Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
