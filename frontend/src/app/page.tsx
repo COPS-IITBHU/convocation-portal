@@ -12,8 +12,11 @@ import {
   IconButton,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import Cookies from 'js-cookie';
 
 export default function SignIn() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => {
@@ -22,6 +25,34 @@ export default function SignIn() {
 
   const handleMouseDownPassword = (event: React.MouseEvent) => {
     event.preventDefault();
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // Prepare the payload for the login request
+    const loginData = { email, unhashedPassword: password };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.token) {
+        Cookies.set('token', data.token, { expires: 7 });
+        console.log('login successful')
+      } else {
+        console.error('login failed')
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -34,7 +65,7 @@ export default function SignIn() {
           Sign In
         </Typography>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <TextField
               label="Email"
@@ -42,6 +73,8 @@ export default function SignIn() {
               fullWidth
               variant="outlined"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -50,6 +83,8 @@ export default function SignIn() {
               <InputLabel>Password</InputLabel>
               <OutlinedInput
                 type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton

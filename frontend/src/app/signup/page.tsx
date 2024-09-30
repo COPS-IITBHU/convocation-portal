@@ -21,7 +21,7 @@ export default function SignUp() {
     name: '',
     branch: '',
     rollNumber: '',
-    password: '',
+    unhashedPassword: '',
   });
 
   const handleClickShowPassword = () => {
@@ -134,9 +134,9 @@ export default function SignUp() {
             <FormControl fullWidth variant="outlined">
               <InputLabel>Password</InputLabel>
               <OutlinedInput
-                name="password"
+                name="unhashedPassword"
                 type={showPassword ? 'text' : 'password'}
-                value={formData.password}
+                value={formData.unhashedPassword}
                 onChange={handleChange}
                 endAdornment={
                   <InputAdornment position="end">
