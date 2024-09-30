@@ -7,10 +7,12 @@ const nodemailer = require('nodemailer');
 const { authRouter } = require('./auth');
 const cors = require('cors')
 
+
 const app = express();
+app.use(cors())
 app.use(bodyParser.json());
 app.use('/api/auth/', authRouter)
-app.use(cors())
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URL)
