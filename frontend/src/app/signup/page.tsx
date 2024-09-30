@@ -11,7 +11,8 @@ import {
   InputAdornment,
   IconButton,
   Select,
-  MenuItem
+  MenuItem,
+  Box
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
@@ -84,11 +85,24 @@ export default function SignUp() {
   };
 
   return (
-    <Container
-      maxWidth="xs"
-      className="flex justify-center items-center min-h-screen bg-gray-100"
+    <Box
+      sx={{
+        backgroundColor: 'gray', // Set gray background color
+        minHeight: '100vh',      // Ensure the background covers the full height of the viewport
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full">
+      <Container
+        maxWidth="xs"
+        sx={{
+          backgroundColor: 'white', // White background for the form container
+          padding: '2rem',
+          borderRadius: '8px',
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <Typography variant="h4" className="text-center mb-6 text-black">
           Register
         </Typography>
@@ -128,6 +142,7 @@ export default function SignUp() {
               name="branch"
               value={formData.branch}
               onChange={handleChange}
+              variant="outlined"
             >
               <MenuItem value="CSE">Computer Science</MenuItem>
               <MenuItem value="ECE">Electronics</MenuItem>
@@ -184,7 +199,7 @@ export default function SignUp() {
             Already have an account? <a href="/" className="text-blue-500">Sign In</a>
           </Typography>
         </form>
-      </div>
-    </Container>
+      </Container>
+    </Box>
   );
 }

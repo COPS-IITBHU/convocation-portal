@@ -14,6 +14,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation'; // Import the router
+import Box from '@mui/material/Box';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -67,11 +68,24 @@ export default function SignIn() {
   };
 
   return (
-    <Container
-      maxWidth="xs"
-      className="flex justify-center items-center min-h-screen bg-gray-100"
+    <Box
+      sx={{
+        backgroundColor: 'gray', // Set gray background color
+        minHeight: '100vh', // Make sure the background covers the full height of the viewport
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full">
+      <Container
+        maxWidth="xs"
+        sx={{
+          backgroundColor: 'white', // White background for the form container
+          padding: '2rem',
+          borderRadius: '8px',
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <Typography variant="h4" className="text-center mb-6 text-black">
           Sign In
         </Typography>
@@ -123,7 +137,7 @@ export default function SignIn() {
             Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
           </Typography>
         </form>
-      </div>
-    </Container>
+      </Container>
+    </Box>
   );
 }
