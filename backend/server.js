@@ -102,18 +102,49 @@ app.post('/api/initializelocations', async (req, res) => {
    }
 });
 
-app.get('/api/allrooms', async (req, res) => {
+app.get('/api/unoccupied-rooms', async (req, res) => {
    try {
       const locations = await locationSchema.find();
-      const allrooms = locations.map(location => {
+      const unoccupiedRooms = locations.map(location => {
          return {
             location: location.locationName,
-            rooms: location.rooms
+            rooms: location.rooms.filter(room => room.occupants.length === 0)
          };
       });
-      res.status(200).json(allrooms);
+      res.status(200).json(unoccupiedRooms);
    } catch (error) {
-      res.status(500).json({ message: 'Could not fetch all rooms' });
+      res.status(500).json({ message: 'Could not fetch unoccupied rooms' });
+   }
+}
+);
+
+app.get('/api/occupied-rooms', async (req, res) => {
+   try {
+      const locations = await locationSchema.find();
+      const occupiedRooms = locations.map(location => {
+         return {
+            location: location.locationName,
+            rooms: location.rooms.filter(room => room.occupants.length == room.capacity)
+         };
+      });
+      res.status(200).json(occupiedRooms);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch occupied rooms' });
+   }
+});
+
+app.get('/api/partially-occupied-rooms', async (req, res) => {
+   try {
+      const locations = await locationSchema.find();
+      const partiallyOccupiedRooms = locations.map(location => {
+         return {
+            location: location.locationName,
+            rooms: location.rooms.filter(room => room.occupants.length > 0 && room.occupants.length < room.capacity)
+         };
+      });
+      res.status(200).json(partiallyOccupiedRooms);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch partially occupied rooms' });
    }
 });
 

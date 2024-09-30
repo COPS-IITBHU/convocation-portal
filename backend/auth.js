@@ -38,6 +38,7 @@ authRouter.post('/register', async (req, res) => {
         await newUser.save();
 
         const token = jwt.sign({ email, rollNumber, name, branch }, key);
+        // localStorage.setItem('token', token);  
 
         return res.status(201).json({ token });
     } catch (error) {
@@ -69,6 +70,7 @@ authRouter.post('/login' , async (req, res) => {
                 rollNumber: user.rollNumber,
                 branch: user.branch
             }, key)
+            // localStorage.setItem('token', token);
 
             return res.json({token})
         }else{

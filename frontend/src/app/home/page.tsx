@@ -23,6 +23,8 @@ import { useTheme } from '@mui/material/styles';
 import { AlertCircle, ChevronRight, LogOut } from "lucide-react";
 import Cookies from 'js-cookie'; 
 import { useRouter } from 'next/navigation';
+import { jwtDecode } from "jwt-decode";
+import local from "next/font/local";
 
 interface RoomInfo {
   hostel: string;
@@ -61,11 +63,54 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
   );
 };
 
+const handleUnoccupiedRooms = async () => {
+  const unoccupiedrooms = await fetch('http://localhost:5000/api/unoccupied-rooms', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  const unoccupiedroomsdata = await unoccupiedrooms.json();
+  return unoccupiedroomsdata;
+};
+
+const handleOccupiedRooms = async () => {
+  const occupiedrooms = await fetch('http://localhost:5000/api/occupied-rooms', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  const occupiedroomsdata = await occupiedrooms.json();
+  return occupiedroomsdata;
+};
+
+const handlePartiallyOccupiedRooms = async () => {
+  const partiallyoccupiedrooms = await fetch('http://localhost:5000/api/partially-occupied-rooms', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  const partiallyoccupiedroomsdata = await partiallyoccupiedrooms.json();
+  return partiallyoccupiedroomsdata;
+};
+
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
+  const token = Cookies.get('token');
+  let userdetails = {};
+
+  if (token) {
+    userdetails = jwtDecode(token);
+    console.log(userdetails);
+  }
+  if (!token) {
+    router.push('/');
+  }
 
   const handleLogout = () => {
     // Remove the token cookie and navigate to the login page
@@ -73,6 +118,12 @@ export default function Home() {
     router.push('/');
     setShowLogoutConfirm(false);
   };
+
+  const unoccupiedroomsdata = handleUnoccupiedRooms();
+  const occupiedroomsdata = handleOccupiedRooms();
+  const partiallyoccupiedroomsdata = handlePartiallyOccupiedRooms();
+
+  // console.log(unoccupiedroomsdata);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -94,10 +145,10 @@ export default function Home() {
           gap: 2 
         }}>
           <Box textAlign={isSmallScreen ? 'left' : 'right'}>
-            <Typography variant="subtitle1" className="text-black">Aayush Khanna</Typography>
-            <Typography variant="body2" className="text-black">Civil Engineering</Typography>
+            <Typography variant="subtitle1" className="text-black">{userdetails.name}</Typography>
+            <Typography variant="body2" className="text-black">{userdetails.branch}</Typography>
             <Typography variant="caption" className="text-black" sx={{ wordBreak: 'break-word' }}>
-              aayush.khanna.cd.civ23@iitbhu.ac.in
+              {userdetails.email}
             </Typography>
           </Box>
           <Button

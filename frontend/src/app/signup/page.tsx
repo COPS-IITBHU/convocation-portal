@@ -58,6 +58,7 @@ export default function SignUp() {
     e.preventDefault();
 
     try {
+      console.log('Form data:', formData);
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: {
@@ -144,10 +145,10 @@ export default function SignUp() {
               onChange={handleChange}
               variant="outlined"
             >
-              <MenuItem value="CSE">Computer Science</MenuItem>
-              <MenuItem value="ECE">Electronics</MenuItem>
-              <MenuItem value="ME">Mechanical</MenuItem>
-              <MenuItem value="CE">Civil</MenuItem>
+              <MenuItem value="Computer Science and Engineering">Computer Science</MenuItem>
+              <MenuItem value="Electronics Engineering">Electronics</MenuItem>
+              <MenuItem value="Mechanical Engineering">Mechanical</MenuItem>
+              <MenuItem value="Civil Engineering">Civil</MenuItem>
             </Select>
           </FormControl>
 
