@@ -46,7 +46,7 @@ interface RoomInfo {
   rooms: Array<Room>;
 }
 
-const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[] }) => {
+const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: RoomInfo[], alumni: Alumni }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -62,7 +62,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }} className="text-black">{info.location}</Typography>
               <List dense>
                 {info.rooms.map((room, roomIndex) => (
-                  <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }}>
+                  <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }} onClick={handleRoomBooking(alumni, info.location, room.roomName, true)}>
                     <ListItemIcon>
                       <ChevronRight size={20} />
                     </ListItemIcon>
@@ -111,6 +111,29 @@ const handlePartiallyOccupiedRooms = async () => {
   return partiallyoccupiedroomsdata;
 };
 
+const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean) => {
+  const booking = await fetch('http://localhost:5000/api/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: alumDetails.name,
+      branch: alumDetails.branch,
+      rollNumber: alumDetails.rollNumber,
+      email: alumDetails.email,
+      roomLocation: roomLocation,
+      roomName: roomName,
+      meal: meal,
+    }),
+  });
+  const bookingdata = await booking.json();
+  alumDetails.roomLocation = roomLocation;
+  alumDetails.roomName = roomName;
+  alumDetails.meal = meal;
+  return bookingdata;
+};
+
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [unoccupiedroomsdata, setUnoccupiedRoomsData] = useState([]);
@@ -120,11 +143,26 @@ export default function Home() {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
   const token = Cookies.get('token');
-  let userdetails = {};
+  let userdetails = {
+    name: '',
+    branch: '',
+    rollNumber: '',
+    email: ''
+  };
+  const [alumDetails, setAlumDetails] = useState<Alumni>({
+    name: '',
+    branch: '',
+    rollNumber: '',
+    email: '',
+    roomLocation: '',
+    roomName: '',
+    meal: false,
+    password: ''
+  });
 
   if (token) {
     userdetails = jwtDecode(token);
-    // console.log(userdetails);
+    console.log(userdetails);
   }
   if (!token) {
     router.push('/');
@@ -148,6 +186,16 @@ export default function Home() {
 
   useEffect(() => {
     getRoomsData();
+    setAlumDetails({
+      name: userdetails.name,
+      branch: userdetails.branch,
+      rollNumber: userdetails.rollNumber,
+      email: userdetails.email,
+      roomLocation: '',
+      roomName: '',
+      meal: false,
+      password: '',
+    });
   }, []);
 
   return (
@@ -192,24 +240,31 @@ export default function Home() {
         </Box>
       </Box>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>Your Current Booking</AlertTitle>
-        Aryabhatta Hostel - Room A109 (mess included)
-      </Alert>
+      {alumDetails.roomName !== '' && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <AlertTitle>Your Current Booking</AlertTitle>
+          <Typography>
+            You have booked a room in <strong>{alumDetails.roomLocation}</strong> with room name <strong>{alumDetails.roomName}</strong>.
+          </Typography>
+        </Alert>
+      )}
 
       <RoomSection
         title="Unoccupied Rooms"
         roomsInfo = {unoccupiedroomsdata}
+        alumni = {alumDetails}
       />
 
       <RoomSection
         title="Occupied Rooms"
         roomsInfo={occupiedroomsdata}
+        alumni = {alumDetails}
       />
 
       <RoomSection
         title="Partially Occupied Rooms"
         roomsInfo={partiallyoccupiedroomsdata}
+        alumni = {alumDetails}
       />
 
       <Dialog open={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)}>
