@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -26,9 +26,24 @@ import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
 import local from "next/font/local";
 
+interface Alumni {
+  name: string,
+   branch: string,
+   rollNumber: string,
+   email: string,
+   roomLocation: string,
+   roomName: string,
+   meal: boolean,
+   password: string
+}
+interface Room {
+  roomName: string;
+  capacity: number;
+  occupants: Array<Alumni>;
+}
 interface RoomInfo {
-  hostel: string;
-  rooms: string[];
+  location: string;
+  rooms: Array<Room>;
 }
 
 const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[] }) => {
@@ -44,14 +59,14 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
         {roomsInfo.map((info, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }} className="text-black">{info.hostel}</Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }} className="text-black">{info.location}</Typography>
               <List dense>
                 {info.rooms.map((room, roomIndex) => (
                   <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }}>
                     <ListItemIcon>
                       <ChevronRight size={20} />
                     </ListItemIcon>
-                    <ListItemText primary={room} />
+                    <ListItemText primary={room.roomName} />
                   </ListItem>
                 ))}
               </List>
@@ -98,6 +113,9 @@ const handlePartiallyOccupiedRooms = async () => {
 
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [unoccupiedroomsdata, setUnoccupiedRoomsData] = useState([]);
+  const [occupiedroomsdata, setOccupiedRoomsData] = useState([]);
+  const [partiallyoccupiedroomsdata, setPartiallyOccupiedRoomsData] = useState([]);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
@@ -106,7 +124,7 @@ export default function Home() {
 
   if (token) {
     userdetails = jwtDecode(token);
-    console.log(userdetails);
+    // console.log(userdetails);
   }
   if (!token) {
     router.push('/');
@@ -119,11 +137,18 @@ export default function Home() {
     setShowLogoutConfirm(false);
   };
 
-  const unoccupiedroomsdata = handleUnoccupiedRooms();
-  const occupiedroomsdata = handleOccupiedRooms();
-  const partiallyoccupiedroomsdata = handlePartiallyOccupiedRooms();
+  const getRoomsData = async () => {
+    const unoccupiedroomsdata = await handleUnoccupiedRooms();
+    const occupiedroomsdata = await handleOccupiedRooms();
+    const partiallyoccupiedroomsdata = await handlePartiallyOccupiedRooms();
+    setUnoccupiedRoomsData(unoccupiedroomsdata);
+    setOccupiedRoomsData(occupiedroomsdata);
+    setPartiallyOccupiedRoomsData(partiallyoccupiedroomsdata);
+  };
 
-  // console.log(unoccupiedroomsdata);
+  useEffect(() => {
+    getRoomsData();
+  }, []);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -174,29 +199,17 @@ export default function Home() {
 
       <RoomSection
         title="Unoccupied Rooms"
-        roomsInfo={[
-          { hostel: "Aryabhatta", rooms: ["43", "A108", "A109", "A110"] },
-          { hostel: "Vishveswaraiya", rooms: ["65", "76"] },
-          { hostel: "Ramanujan", rooms: ["20", "65"] }
-        ]}
+        roomsInfo = {unoccupiedroomsdata}
       />
 
       <RoomSection
         title="Occupied Rooms"
-        roomsInfo={[
-          { hostel: "Aryabhatta", rooms: ["44", "A111", "A112"] },
-          { hostel: "Vishveswaraiya", rooms: ["77", "84", "85"] },
-          { hostel: "Ramanujan", rooms: ["21", "66", "67"] }
-        ]}
+        roomsInfo={occupiedroomsdata}
       />
 
       <RoomSection
         title="Partially Occupied Rooms"
-        roomsInfo={[
-          { hostel: "Aryabhatta", rooms: ["45", "A113"] },
-          { hostel: "Vishveswaraiya", rooms: ["78", "86"] },
-          { hostel: "Ramanujan", rooms: ["22", "68"] }
-        ]}
+        roomsInfo={partiallyoccupiedroomsdata}
       />
 
       <Dialog open={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)}>
