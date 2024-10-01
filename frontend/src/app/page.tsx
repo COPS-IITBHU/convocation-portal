@@ -46,7 +46,7 @@ export default function SignIn() {
     const loginData = { email, unhashedPassword: password };
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://convocation-portal.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

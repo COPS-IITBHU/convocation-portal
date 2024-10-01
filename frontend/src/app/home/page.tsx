@@ -62,7 +62,7 @@ const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: R
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }} className="text-black">{info.location}</Typography>
               <List dense>
                 {info.rooms.map((room, roomIndex) => (
-                  <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }} onClick={handleRoomBooking(alumni, info.location, room.roomName, true)}>
+                  <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }}>
                     <ListItemIcon>
                       <ChevronRight size={20} />
                     </ListItemIcon>
@@ -79,7 +79,7 @@ const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: R
 };
 
 const handleUnoccupiedRooms = async () => {
-  const unoccupiedrooms = await fetch('http://localhost:5000/api/unoccupied-rooms', {
+  const unoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/unoccupied-rooms', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ const handleUnoccupiedRooms = async () => {
 };
 
 const handleOccupiedRooms = async () => {
-  const occupiedrooms = await fetch('http://localhost:5000/api/occupied-rooms', {
+  const occupiedrooms = await fetch('https://convocation-portal.onrender.com/api/occupied-rooms', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const handleOccupiedRooms = async () => {
 };
 
 const handlePartiallyOccupiedRooms = async () => {
-  const partiallyoccupiedrooms = await fetch('http://localhost:5000/api/partially-occupied-rooms', {
+  const partiallyoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/partially-occupied-rooms', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const handlePartiallyOccupiedRooms = async () => {
 };
 
 const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean) => {
-  const booking = await fetch('http://localhost:5000/api/register', {
+  const booking = await fetch('https://convocation-portal.onrender.com/api/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
