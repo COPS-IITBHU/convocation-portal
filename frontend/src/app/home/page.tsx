@@ -4,13 +4,7 @@ import {
   Container,
   Box,
   Typography,
-  Paper,
   Button,
-  Grid,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -25,114 +19,14 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
 import local from "next/font/local";
+import RoomSection from "../components/roomsection";
+import { 
+  handleOccupiedRooms,
+  handlePartiallyOccupiedRooms, 
+  handleUnoccupiedRooms,
+  handleRoomBooking } from "../utils/homeutils";
+import { Alumni } from "../types/types";
 
-interface Alumni {
-  name: string,
-   branch: string,
-   rollNumber: string,
-   email: string,
-   roomLocation: string,
-   roomName: string,
-   meal: boolean,
-   password: string
-}
-interface Room {
-  roomName: string;
-  capacity: number;
-  occupants: Array<Alumni>;
-}
-interface RoomInfo {
-  location: string;
-  rooms: Array<Room>;
-}
-
-const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: RoomInfo[], alumni: Alumni }) => {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-  return (
-    <Box sx={{ mb: 4 }}>
-      <Typography variant="h5" gutterBottom sx={{ borderBottom: `2px solid ${theme.palette.primary.main}`, pb: 1, mb: 2 }} className="text-black">
-        {title}
-      </Typography>
-      <Grid container spacing={2}>
-        {roomsInfo.map((info, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }} className="text-black">{info.location}</Typography>
-              <List dense>
-                {info.rooms.map((room, roomIndex) => (
-                  <ListItem key={roomIndex} sx={{ '&:hover': { bgcolor: theme.palette.action.hover } }}>
-                    <ListItemIcon>
-                      <ChevronRight size={20} />
-                    </ListItemIcon>
-                    <ListItemText primary={room.roomName} />
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
-};
-
-const handleUnoccupiedRooms = async () => {
-  const unoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/unoccupied-rooms', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-  const unoccupiedroomsdata = await unoccupiedrooms.json();
-  return unoccupiedroomsdata;
-};
-
-const handleOccupiedRooms = async () => {
-  const occupiedrooms = await fetch('https://convocation-portal.onrender.com/api/occupied-rooms', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-  const occupiedroomsdata = await occupiedrooms.json();
-  return occupiedroomsdata;
-};
-
-const handlePartiallyOccupiedRooms = async () => {
-  const partiallyoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/partially-occupied-rooms', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
-  const partiallyoccupiedroomsdata = await partiallyoccupiedrooms.json();
-  return partiallyoccupiedroomsdata;
-};
-
-const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean) => {
-  const booking = await fetch('https://convocation-portal.onrender.com/api/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: alumDetails.name,
-      branch: alumDetails.branch,
-      rollNumber: alumDetails.rollNumber,
-      email: alumDetails.email,
-      roomLocation: roomLocation,
-      roomName: roomName,
-      meal: meal,
-    }),
-  });
-  const bookingdata = await booking.json();
-  alumDetails.roomLocation = roomLocation;
-  alumDetails.roomName = roomName;
-  alumDetails.meal = meal;
-  return bookingdata;
-};
 
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -159,14 +53,6 @@ export default function Home() {
     meal: false,
     password: ''
   });
-
-  if (token) {
-    userdetails = jwtDecode(token);
-    console.log(userdetails);
-  }
-  if (!token) {
-    router.push('/');
-  }
 
   const handleLogout = () => {
     // Remove the token cookie and navigate to the login page
@@ -196,6 +82,13 @@ export default function Home() {
       meal: false,
       password: '',
     });
+    if (token) {
+      userdetails = jwtDecode(token);
+      console.log(userdetails);
+    }
+    if (!token) {
+      router.push('/');
+    }
   }, []);
 
   return (
