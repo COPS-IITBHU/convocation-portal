@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { locationSchema } = require('./model');
+const { locationSchema, Room } = require('./model');
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { authRouter } = require('./auth');
@@ -102,21 +102,50 @@ app.post('/api/initializelocations', async (req, res) => {
    }
 });
 
+// Routes
+app.get('/api/available-rooms', async (req, res) => {
+   try {
+      const locations = await locationSchema.find();
+      const availableRooms = locations.map(location => {
+         return {
+            location: location.locationName,
+            rooms: location.rooms
+               .filter(room => room.occupants.length < room.capacity)
+               .map(room => ({
+                  _id: room._id,      // Include the room ID
+                  roomName: room.roomName,
+                  capacity: room.capacity,
+                  occupants: room.occupants
+               }))
+         };
+      });
+      res.status(200).json(availableRooms);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch available rooms' });
+   }
+});
+
 app.get('/api/unoccupied-rooms', async (req, res) => {
    try {
       const locations = await locationSchema.find();
       const unoccupiedRooms = locations.map(location => {
          return {
             location: location.locationName,
-            rooms: location.rooms.filter(room => room.occupants.length === 0)
+            rooms: location.rooms
+               .filter(room => room.occupants.length === 0)
+               .map(room => ({
+                  _id: room._id,      // Include the room ID
+                  roomName: room.roomName,
+                  capacity: room.capacity,
+                  occupants: room.occupants
+               }))
          };
       });
       res.status(200).json(unoccupiedRooms);
    } catch (error) {
       res.status(500).json({ message: 'Could not fetch unoccupied rooms' });
    }
-}
-);
+});
 
 app.get('/api/occupied-rooms', async (req, res) => {
    try {
@@ -124,7 +153,14 @@ app.get('/api/occupied-rooms', async (req, res) => {
       const occupiedRooms = locations.map(location => {
          return {
             location: location.locationName,
-            rooms: location.rooms.filter(room => room.occupants.length == room.capacity)
+            rooms: location.rooms
+               .filter(room => room.occupants.length === room.capacity)
+               .map(room => ({
+                  _id: room._id,      // Include the room ID
+                  roomName: room.roomName,
+                  capacity: room.capacity,
+                  occupants: room.occupants
+               }))
          };
       });
       res.status(200).json(occupiedRooms);
@@ -139,7 +175,14 @@ app.get('/api/partially-occupied-rooms', async (req, res) => {
       const partiallyOccupiedRooms = locations.map(location => {
          return {
             location: location.locationName,
-            rooms: location.rooms.filter(room => room.occupants.length > 0 && room.occupants.length < room.capacity)
+            rooms: location.rooms
+               .filter(room => room.occupants.length > 0 && room.occupants.length < room.capacity)
+               .map(room => ({
+                  _id: room._id,
+                  roomName: room.roomName,
+                  capacity: room.capacity,
+                  occupants: room.occupants
+               }))
          };
       });
       res.status(200).json(partiallyOccupiedRooms);
@@ -147,6 +190,45 @@ app.get('/api/partially-occupied-rooms', async (req, res) => {
       res.status(500).json({ message: 'Could not fetch partially occupied rooms' });
    }
 });
+
+
+app.get('/api/getinfo/:id', async (req, res) => {
+   try {
+       const roomId = req.params.id;
+
+       const locations = await locationSchema.find();
+         for(const location of locations){
+            for(const room of location.rooms){
+               console.log(room._id.toString())
+
+               if(roomId === room._id.toString()){
+                  console.log('FOUND!!!!!!!')
+               }
+            }
+         }
+
+       for (const location of locations) {
+           for (const room of location.rooms) {
+               if (room._id.toString() === roomId) {
+                   return res.status(200).json({
+                       numberOfOccupants: room.occupants.length,
+                       roomCapacity: room.capacity,
+                       roomName: room.roomName,
+                       roomLocation: location.locationName
+                   });
+               }
+           }
+       }
+
+       return res.status(404).json({ error: 'Room not found' });
+
+   } catch (error) {
+       console.error('Error fetching room info:', error);
+       return res.status(500).json({ error: error.message });
+   }
+});
+
+
 
 const transporter = nodemailer.createTransport({
    service: 'gmail',

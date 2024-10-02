@@ -1,57 +1,58 @@
-import { Alumni } from "../types/types";
+import { Alumni, Room } from "../types/types";
 
 export const handleUnoccupiedRooms = async () => {
-    const unoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/unoccupied-rooms', {
+    const unoccupiedrooms = await fetch('http://localhost:5000/api/unoccupied-rooms', {
         method: 'GET',
         headers: {
-        'Content-Type': 'application/json',
-        }
+            'Content-Type': 'application/json',
+        },
     });
-    const unoccupiedroomsdata = await unoccupiedrooms.json();
-    return unoccupiedroomsdata;
+    const unoccupiedroomsdata: Location[] = await unoccupiedrooms.json();
+    return unoccupiedroomsdata.map((location: any) => ({
+        location: location.location,
+        rooms: location.rooms.map((room: any) => ({
+            _id: room._id,
+            roomName: room.roomName,
+            capacity: room.capacity,
+            occupants: room.occupants,
+        })),
+    }));
 };
 
 export const handleOccupiedRooms = async () => {
-    const occupiedrooms = await fetch('https://convocation-portal.onrender.com/api/occupied-rooms', {
+    const occupiedrooms = await fetch('http://localhost:5000/api/occupied-rooms', {
         method: 'GET',
         headers: {
-        'Content-Type': 'application/json',
-        }
+            'Content-Type': 'application/json',
+        },
     });
-    const occupiedroomsdata = await occupiedrooms.json();
-    return occupiedroomsdata;
+    const occupiedroomsdata: Location[] = await occupiedrooms.json();
+    return occupiedroomsdata.map((location: any) => ({
+        location: location.location,
+        rooms: location.rooms.map((room: any) => ({
+            _id: room._id,
+            roomName: room.roomName,
+            capacity: room.capacity,
+            occupants: room.occupants,
+        })),
+    }));
 };
 
 export const handlePartiallyOccupiedRooms = async () => {
-    const partiallyoccupiedrooms = await fetch('https://convocation-portal.onrender.com/api/partially-occupied-rooms', {
+    const partiallyoccupiedrooms = await fetch('http://localhost:5000/api/partially-occupied-rooms', {
         method: 'GET',
         headers: {
-        'Content-Type': 'application/json',
-        }
-    });
-    const partiallyoccupiedroomsdata = await partiallyoccupiedrooms.json();
-    return partiallyoccupiedroomsdata;
-};
-
-export const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean) => {
-    const booking = await fetch('https://convocation-portal.onrender.com/api/register', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-        name: alumDetails.name,
-        branch: alumDetails.branch,
-        rollNumber: alumDetails.rollNumber,
-        email: alumDetails.email,
-        roomLocation: roomLocation,
-        roomName: roomName,
-        meal: meal,
-        }),
     });
-    const bookingdata = await booking.json();
-    alumDetails.roomLocation = roomLocation;
-    alumDetails.roomName = roomName;
-    alumDetails.meal = meal;
-    return bookingdata;
+    const partiallyoccupiedroomsdata: Location[] = await partiallyoccupiedrooms.json();
+    return partiallyoccupiedroomsdata.map((location: any) => ({
+        location: location.location,
+        rooms: location.rooms.map((room: any) => ({
+            _id: room._id,
+            roomName: room.roomName,
+            capacity: room.capacity,
+            occupants: room.occupants,
+        })),
+    }));
 };
