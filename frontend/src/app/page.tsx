@@ -42,7 +42,7 @@ export default function SignIn() {
     const loginData = { email, unhashedPassword: password };
 
     try {
-      const response = await fetch('https://convocation-portal.onrender.com/api/auth/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -243,16 +243,7 @@ export default function SignIn() {
               width: '100%',
             }}
           >
-            <Image
-              src={copsLogo}
-              alt="COPS Logo"
-              width={100}
-              height={100}
-              style={{ 
-                objectFit: 'contain',
-                borderRadius: '2rem'
-              }}
-            />
+            Made with ❤️ by COPS
           </Box>
         </form>
       </Paper>

@@ -3,7 +3,9 @@ const authRouter = express.Router();
 const { Alum } = require('./model');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
+
+// const { locationSchema, Room, Alum } = require('./model');
 
 dotenv.config()
 
@@ -36,6 +38,7 @@ authRouter.post('/register', async (req, res) => {
             rollNumber
         });
         await newUser.save();
+        // await Alum.create(newUser);
 
         const token = jwt.sign({ email, rollNumber, name, branch }, key);
         // localStorage.setItem('token', token);  

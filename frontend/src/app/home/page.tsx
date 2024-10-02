@@ -319,16 +319,7 @@ export default function Home() {
               mt: 4,
             }}
           >
-            <Image
-              src={copsLogo}
-              alt="COPS Logo"
-              width={100}
-              height={100}
-              style={{ 
-                objectFit: 'contain',
-                borderRadius: '2rem'
-              }}
-            />
+            Made with ❤️ by COPS
           </Box>
         </Paper>
       </Container>

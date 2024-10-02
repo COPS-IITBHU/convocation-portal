@@ -39,10 +39,10 @@ app.post('/api/register', async (req, res) => {
  
    try {
      // Check if an alum with the same roll number or email already exists
-     const existingAlum = await Alum.findOne({ $or: [{ rollNumber }, { email }] });
-     if (existingAlum) {
-       return res.status(409).json({ message: 'Alum already registered with the same roll number or email.' });
-     }
+   //   const existingAlum = await Alum.findOne({ $or: [{ rollNumber }, { email }] });
+   //   if (existingAlum) {
+   //     return res.status(409).json({ message: 'Alum already registered with the same roll number or email.' });
+   //   }
  
      // Validate location
      const location = await locationSchema.findOne({ locationName: roomLocation });
@@ -74,6 +74,7 @@ app.post('/api/register', async (req, res) => {
  
      // Insert the new alum
      await Alum.create(newAlum);
+     console.log('Alum registered successfully:', newAlum);
  
      // Add the alum to room occupants
      room.occupants.push(newAlum);
@@ -96,7 +97,7 @@ app.post('/api/initializelocations', async (req, res) => {
       await locationSchema.deleteMany({});
       const predefinedLocations = [
          {
-            locationName: 'A',
+            locationName: 'Aryabhatta Hostel',
             rooms: [
                { roomName: 'A101', capacity: 2, occupants: [] },
                { roomName: 'A102', capacity: 2, occupants: [] },
@@ -104,7 +105,7 @@ app.post('/api/initializelocations', async (req, res) => {
             ]
          },
          {
-            locationName: 'B',
+            locationName: 'Ramanujan Hostel',
             rooms: [
                { roomName: 'B101', capacity: 2, occupants: [] },
                { roomName: 'B102', capacity: 2, occupants: [] },
@@ -112,7 +113,7 @@ app.post('/api/initializelocations', async (req, res) => {
             ]
          },
          {
-            locationName: 'C',
+            locationName: 'Dhanrajgiri Hostel',
             rooms: [
                { roomName: 'C101', capacity: 2, occupants: [] },
                { roomName: 'C102', capacity: 2, occupants: [] },
@@ -273,9 +274,26 @@ app.post('/alum-room-info', async (req, res) => {
      return res.status(500).json({ message: 'Server error. Could not retrieve alum information.' });
    }
  });
+
+ app.get('/api/all-rooms-info-to-mail', async (req, res) => {
+   try {
+      const locations = await locationSchema.find();
+      const allRoomsInfo = locations.map(location => {
+         return {
+            location: location.locationName,
+            rooms: location.rooms.map(room => ({
+               roomName: room.roomName,
+               capacity: room.capacity,
+               occupants: room.occupants
+            }))
+         };
+      });
+      res.status(200).json(allRoomsInfo);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch all rooms info' });
+   }
+});
  
-
-
 const transporter = nodemailer.createTransport({
    service: 'gmail',
    auth: {

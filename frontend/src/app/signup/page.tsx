@@ -55,7 +55,7 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://convocation-portal.onrender.com/api/auth/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -298,12 +298,7 @@ export default function SignUp() {
           maxWidth: '800px',
         }}
       >
-        <Image
-          src={copsLogo}
-          alt="SNTC Logo"
-          width={100}
-          style={{ objectFit: 'contain', borderRadius:'2rem' }}
-        />
+        Made with ❤️ by COPS
       </Box>
         </form>
         
