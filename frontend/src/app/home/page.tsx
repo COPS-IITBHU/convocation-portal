@@ -27,7 +27,7 @@ import {
   handleUnoccupiedRooms,
 } from "../utils/homeutils";
 import { Alumni, RoomInfo } from "../types/types";
-import copsLogo from '../assets/COPS_LOGO (1).png';
+// import copsLogo from '../assets/COPS_LOGO (1).png';
 import sntcLogo from '../assets/image.png';
 import IITBHULOGO from '../assets/image (1).png';
 
@@ -290,7 +290,6 @@ export default function Home() {
             <RoomSection
               title="Unoccupied Rooms"
               roomsInfo={unoccupiedroomsdata}
-              alumni={alumDetails}
             />
           </Box>
 
@@ -298,7 +297,6 @@ export default function Home() {
             <RoomSection
               title="Partially Occupied Rooms"
               roomsInfo={partiallyoccupiedroomsdata}
-              alumni={alumDetails}
             />
           </Box>
 
@@ -306,7 +304,6 @@ export default function Home() {
             <RoomSection
               title="Occupied Rooms"
               roomsInfo={occupiedroomsdata}
-              alumni={alumDetails}
             />
           </Box>
 

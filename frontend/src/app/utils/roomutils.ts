@@ -1,12 +1,5 @@
 import { Alumni } from "../types/types";
 
-interface RoomDetails {
-    numberOfOccupants: number;
-    roomCapacity: number;
-    roomName: string;
-    roomLocation: string;
-}
-
 export const getRoomDetails = async (_id: string) => {
     const roomInfo = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/getinfo/${_id}`, {
         method: 'GET',

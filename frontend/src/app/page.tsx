@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
   TextField,
   Button,
   Typography,
@@ -17,7 +16,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
-import copsLogo from './assets/COPS_LOGO (1).png';
+// import copsLogo from './assets/COPS_LOGO (1).png';
 import sntcLogo from './assets/image.png';
 import iitbhulogo from './assets/image (1).png';
 
@@ -217,22 +216,19 @@ export default function SignIn() {
             Sign In
           </Button>
 
-          <Typography sx={{ textAlign: 'center', color: '#666', marginBottom: '2rem' }}>
-            Don't have an account?{' '}
+            <Typography sx={{ textAlign: 'center', color: '#666', marginBottom: '2rem' }}>
+            Don&apos;t have an account?{' '}
             <a 
               href="/signup" 
               style={{
-                color: '#1a237e',
-                textDecoration: 'none',
-                fontWeight: '500',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
+              color: '#1a237e',
+              textDecoration: 'none',
+              fontWeight: '500',
               }}
             >
               Sign Up
             </a>
-          </Typography>
+            </Typography>
 
           {/* COPS Logo at Bottom */}
           <Box

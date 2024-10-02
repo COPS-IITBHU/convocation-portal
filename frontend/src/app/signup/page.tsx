@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
   TextField,
   Button,
   Typography,
@@ -19,7 +18,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import copsLogo from '../assets/COPS_LOGO (1).png';
+// import copsLogo from '../assets/COPS_LOGO (1).png';
 import sntcLogo from '../assets/image.png';
 import IITBHULOGO from '../assets/image (1).png';
 
@@ -278,9 +277,6 @@ export default function SignUp() {
                 color: '#1a237e',
                 textDecoration: 'none',
                 fontWeight: '500',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
               }}
             >
               Sign In

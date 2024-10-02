@@ -13,7 +13,6 @@ import {
     DialogContent,
     DialogActions,
     Button,
-    useMediaQuery,
     Switch,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -25,7 +24,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
 
-const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: RoomInfo[]; alumni: Alumni }) => {
+const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[] }) => {
     const router = useRouter();
     const token = Cookies.get('token');
 
@@ -41,7 +40,7 @@ const RoomSection = ({ title, roomsInfo, alumni }: { title: string; roomsInfo: R
     });
 
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [open, setOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);

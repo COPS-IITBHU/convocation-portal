@@ -1,5 +1,3 @@
-import { Alumni, Room } from "../types/types";
-
 export const handleUnoccupiedRooms = async () => {
     const unoccupiedrooms = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/unoccupied-rooms`, {
         method: 'GET',
