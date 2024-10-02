@@ -71,20 +71,20 @@ app.post('/api/register', async (req, res) => {
        roomName,
        meal,
      };
- 
-     // Insert the new alum
-     await Alum.create(newAlum);
-     console.log('Alum registered successfully:', newAlum);
- 
-     // Add the alum to room occupants
-     room.occupants.push(newAlum);
-     await location.save();
- 
-     // Send room allocation email
-     sendRoomAllocationEmail(email, name, roomLocation, roomName);
- 
-     // Send success response
-     return res.status(201).json({ message: 'Alum registered successfully and email sent.' });
+
+   await Alum.deleteMany({ $or: [{ rollNumber }, { email }] });
+   await Alum.create(newAlum);
+   console.log('Alum registered successfully:', newAlum);
+         
+            // Add the alum to room occupants
+   room.occupants.push(newAlum);
+   await location.save();
+         
+            // Send room allocation email
+   sendRoomAllocationEmail(email, name, roomLocation, roomName);
+         
+            // Send success response
+   return res.status(201).json({ message: 'Alum registered successfully and email sent.' });          
  
    } catch (error) {
      console.error('Error registering alum:', error);
@@ -259,7 +259,7 @@ app.post('/alum-room-info', async (req, res) => {
  
    try {
      // Find alum matching all four fields
-     const alum = await Alum.findOne({ name, branch, rollNumber, email });
+     const alum = await Alum.findOne({ email });
  
      // If no alum is found, return 404
      if (!alum) {
@@ -291,6 +291,24 @@ app.post('/alum-room-info', async (req, res) => {
       res.status(200).json(allRoomsInfo);
    } catch (error) {
       res.status(500).json({ message: 'Could not fetch all rooms info' });
+   }
+});
+
+app.get('/api/all-alums', async (req, res) => {
+   try {
+      const alums = await Alum.find();
+      res.status(200).json(alums);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch alums' });
+   }
+});
+
+app.get('/api/clean-alums', async (req, res) => {
+   try {
+      await Alum.deleteMany();
+      res.status(200).json({ message: 'Alums cleaned successfully' });
+   } catch (error) {
+      res.status(500).json({ message: 'Could not clean alums' });
    }
 });
  
