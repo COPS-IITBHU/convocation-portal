@@ -10,39 +10,35 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
+  Paper,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation'; // Import the router
+import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
+import Image from 'next/image';
+import copsLogo from './assets/COPS_LOGO (1).png';
+import sntcLogo from './assets/image.png';
+import iitbhulogo from './assets/image (1).png';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   useEffect(() => {
-    // Check if the token exists in the cookies
     const token = Cookies.get('token');
     if (token) {
-      // Redirect to /home if token exists
       router.push('/home');
     }
   }, [router]);
 
-  const handleClickShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent) => {
-    event.preventDefault();
-  };
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleMouseDownPassword = (event: React.MouseEvent) => event.preventDefault();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    // Prepare the payload for the login request
     const loginData = { email, unhashedPassword: password };
 
     try {
@@ -58,7 +54,7 @@ export default function SignIn() {
 
       if (response.ok && data.token) {
         Cookies.set('token', data.token, { expires: 7 });
-        router.push('/home'); // Redirect to /home on successful login
+        router.push('/home');
       } else {
         console.error('Login failed');
       }
@@ -70,74 +66,196 @@ export default function SignIn() {
   return (
     <Box
       sx={{
-        backgroundColor: 'gray', // Set gray background color
-        minHeight: '100vh', // Make sure the background covers the full height of the viewport
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        padding: '2rem',
       }}
     >
-      <Container
-        maxWidth="xs"
+      {/* Updated Top Logos Container */}
+      <Box
         sx={{
-          backgroundColor: 'white', // White background for the form container
-          padding: '2rem',
-          borderRadius: '8px',
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '2rem',
+          marginBottom: '2rem',
+          width: '100%',
+          maxWidth: '800px',
+          position: 'relative',
         }}
       >
-        <Typography variant="h4" className="text-center mb-6 text-black">
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            width: '60%',
+          }}
+        >
+          <Image
+            src={sntcLogo}
+            alt="SNTC Logo"
+            width={400}
+            height={100}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '40%',
+          }}
+        >
+          <Image
+            src={iitbhulogo}
+            alt="IIT BHU Logo"
+            width={120}
+            height={120}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+      </Box>
+
+      {/* Welcome Text */}
+      <Typography
+        variant="h3"
+        sx={{
+          marginBottom: '2rem',
+          color: '#1a237e',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+        }}
+      >
+        Welcome to Convocation 2024!
+      </Typography>
+
+      <Paper
+        elevation={4}
+        sx={{
+          width: '100%',
+          maxWidth: '450px',
+          padding: '2rem',
+          borderRadius: '15px',
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        }}
+      >
+        <Typography 
+          variant="h5" 
+          sx={{
+            textAlign: 'center',
+            marginBottom: '1.5rem',
+            color: '#1a237e',
+            fontWeight: '500',
+          }}
+        >
           Sign In
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <TextField
-              label="Email"
-              type="email"
-              fullWidth
-              variant="outlined"
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            variant="outlined"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ marginBottom: '1.5rem' }}
+          />
+
+          <FormControl fullWidth variant="outlined" sx={{ marginBottom: '1.5rem' }}>
+            <InputLabel>Password</InputLabel>
+            <OutlinedInput
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Password"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
             />
-          </div>
+          </FormControl>
 
-          <div className="mb-4">
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Password</InputLabel>
-              <OutlinedInput
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-                required
-              />
-            </FormControl>
-          </div>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            fullWidth 
+            type="submit"
+            sx={{
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              backgroundColor: '#1a237e',
+              '&:hover': {
+                backgroundColor: '#303f9f',
+              },
+            }}
+          >
+            Sign In
+          </Button>
 
-          <div className="mb-4 flex items-center justify-between">
-            <Button variant="contained" color="primary" fullWidth type="submit">
-              Sign In
-            </Button>
-          </div>
-
-          <Typography className="text-center mt-4 text-black">
-            Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
+          <Typography sx={{ textAlign: 'center', color: '#666', marginBottom: '2rem' }}>
+            Don't have an account?{' '}
+            <a 
+              href="/signup" 
+              style={{
+                color: '#1a237e',
+                textDecoration: 'none',
+                fontWeight: '500',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Sign Up
+            </a>
           </Typography>
+
+          {/* COPS Logo at Bottom */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <Image
+              src={copsLogo}
+              alt="COPS Logo"
+              width={100}
+              height={100}
+              style={{ 
+                objectFit: 'contain',
+                borderRadius: '2rem'
+              }}
+            />
+          </Box>
         </form>
-      </Container>
+      </Paper>
     </Box>
   );
 }

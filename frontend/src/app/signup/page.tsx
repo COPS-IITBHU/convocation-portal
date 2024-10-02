@@ -12,11 +12,16 @@ import {
   IconButton,
   Select,
   MenuItem,
-  Box
+  Box,
+  Paper
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';  // Correct import for Next.js App Router
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import copsLogo from '../assets/COPS_LOGO (1).png';
+import sntcLogo from '../assets/image.png';
+import IITBHULOGO from '../assets/image (1).png';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,24 +32,17 @@ export default function SignUp() {
     rollNumber: '',
     unhashedPassword: '',
   });
-  const router = useRouter();  // Using the App Router's `useRouter`
+  const router = useRouter();
 
   useEffect(() => {
-    // Check if the token exists in the cookies
     const token = Cookies.get('token');
     if (token) {
-      // If token exists, redirect to /home
       router.push('/home');
     }
   }, [router]);
 
-  const handleClickShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent) => {
-    event.preventDefault();
-  };
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleMouseDownPassword = (event: React.MouseEvent) => event.preventDefault();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name?: string; value: unknown } }) => {
     const { name, value } = e.target;
@@ -56,9 +54,7 @@ export default function SignUp() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      console.log('Form data:', formData);
       const response = await fetch('https://convocation-portal.onrender.com/api/auth/register', {
         method: 'POST',
         headers: {
@@ -68,14 +64,8 @@ export default function SignUp() {
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        const token = data.token;
-
-        // Set the token in cookies with a 7-day expiry
-        Cookies.set('token', token, { expires: 7 });
-
-        // Redirect to /home upon successful registration
+        Cookies.set('token', data.token, { expires: 7 });
         router.push('/home');
       } else {
         console.error('Registration failed:', data.message);
@@ -88,55 +78,131 @@ export default function SignUp() {
   return (
     <Box
       sx={{
-        backgroundColor: 'gray', // Set gray background color
-        minHeight: '100vh',      // Ensure the background covers the full height of the viewport
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        padding: '2rem',
       }}
     >
-      <Container
-        maxWidth="xs"
+      <Box
         sx={{
-          backgroundColor: 'white', // White background for the form container
-          padding: '2rem',
-          borderRadius: '8px',
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '2rem',
+          marginBottom: '2rem',
+          width: '100%',
+          maxWidth: '800px',
+          position: 'relative',
         }}
       >
-        <Typography variant="h4" className="text-center mb-6 text-black">
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            width: '60%',
+          }}
+        >
+          <Image
+            src={sntcLogo}
+            alt="SNTC Logo"
+            width={400}
+            height={100}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '40%',
+          }}
+        >
+          <Image
+            src={IITBHULOGO}
+            alt="IIT BHU Logo"
+            width={120}
+            height={120}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+      </Box>
+
+      {/* Welcome Text */}
+      <Typography
+        variant="h3"
+        sx={{
+          marginBottom: '2rem',
+          color: '#1a237e',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+        }}
+      >
+        Welcomes you to Convocation 2024 !
+      </Typography>
+
+      <Paper
+        elevation={4}
+        sx={{
+          width: '100%',
+          maxWidth: '450px',
+          padding: '2rem',
+          borderRadius: '15px',
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        }}
+      >
+        <Typography 
+          variant="h5" 
+          sx={{
+            textAlign: 'center',
+            marginBottom: '1.5rem',
+            color: '#1a237e',
+            fontWeight: '500',
+          }}
+        >
           Register
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <TextField
-              label="Email"
-              type="email"
-              fullWidth
-              variant="outlined"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            variant="outlined"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            sx={{ marginBottom: '1rem' }}
+          />
 
-          <div className="mb-4">
-            <TextField
-              label="Name"
-              type="text"
-              fullWidth
-              variant="outlined"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <TextField
+            label="Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            sx={{ marginBottom: '1rem' }}
+          />
 
-          {/* Branch Dropdown */}
-          <FormControl fullWidth margin="normal" required>
+          <FormControl fullWidth sx={{ marginBottom: '1rem' }} required>
             <InputLabel id="branch-label">Branch</InputLabel>
             <Select
               labelId="branch-label"
@@ -152,55 +218,99 @@ export default function SignUp() {
             </Select>
           </FormControl>
 
-          <div className="mb-4">
-            <TextField
-              label="Roll Number"
-              type="number"
-              fullWidth
-              variant="outlined"
-              name="rollNumber"
-              value={formData.rollNumber}
+          <TextField
+            label="Roll Number"
+            type="number"
+            fullWidth
+            variant="outlined"
+            name="rollNumber"
+            value={formData.rollNumber}
+            onChange={handleChange}
+            required
+            sx={{ marginBottom: '1rem' }}
+          />
+
+          <FormControl fullWidth sx={{ marginBottom: '1.5rem' }} variant="outlined">
+            <InputLabel>Password</InputLabel>
+            <OutlinedInput
+              name="unhashedPassword"
+              type={showPassword ? 'text' : 'password'}
+              value={formData.unhashedPassword}
               onChange={handleChange}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Password"
               required
             />
-          </div>
+          </FormControl>
 
-          <div className="mb-4">
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Password</InputLabel>
-              <OutlinedInput
-                name="unhashedPassword"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.unhashedPassword}
-                onChange={handleChange}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-                required
-              />
-            </FormControl>
-          </div>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            fullWidth 
+            type="submit"
+            sx={{
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              backgroundColor: '#1a237e',
+              '&:hover': {
+                backgroundColor: '#303f9f',
+              },
+            }}
+          >
+            Sign Up
+          </Button>
 
-          <div className="mb-4 flex items-center justify-between">
-            <Button variant="contained" color="primary" fullWidth type="submit">
-              Sign Up
-            </Button>
-          </div>
-
-          <Typography className="text-center mt-4 text-black">
-            Already have an account? <a href="/" className="text-blue-500">Sign In</a>
+          <Typography sx={{ textAlign: 'center', color: '#666' }}>
+            Already have an account?{' '}
+            <a 
+              href="/" 
+              style={{
+                color: '#1a237e',
+                textDecoration: 'none',
+                fontWeight: '500',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Sign In
+            </a>
           </Typography>
+          <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '2rem',
+          marginTop:'2rem',
+          marginBottom: '0.5rem',
+          width: '100%',
+          maxWidth: '800px',
+        }}
+      >
+        <Image
+          src={copsLogo}
+          alt="SNTC Logo"
+          width={100}
+          style={{ objectFit: 'contain', borderRadius:'2rem' }}
+        />
+      </Box>
         </form>
-      </Container>
+        
+      </Paper>
+      
+
     </Box>
+    
   );
 }
