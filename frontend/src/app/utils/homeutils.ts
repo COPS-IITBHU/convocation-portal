@@ -1,7 +1,7 @@
 import { Alumni, Room } from "../types/types";
 
 export const handleUnoccupiedRooms = async () => {
-    const unoccupiedrooms = await fetch('http://localhost:5000/api/unoccupied-rooms', {
+    const unoccupiedrooms = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/unoccupied-rooms`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export const handleUnoccupiedRooms = async () => {
 };
 
 export const handleOccupiedRooms = async () => {
-    const occupiedrooms = await fetch('http://localhost:5000/api/occupied-rooms', {
+    const occupiedrooms = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/occupied-rooms`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const handleOccupiedRooms = async () => {
 };
 
 export const handlePartiallyOccupiedRooms = async () => {
-    const partiallyoccupiedrooms = await fetch('http://localhost:5000/api/partially-occupied-rooms', {
+    const partiallyoccupiedrooms = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/partially-occupied-rooms`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

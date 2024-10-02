@@ -14,7 +14,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { AlertCircle, ChevronRight, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Cookies from 'js-cookie'; 
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from "jwt-decode";
@@ -24,7 +24,7 @@ import {
   handlePartiallyOccupiedRooms, 
   handleUnoccupiedRooms,
 } from "../utils/homeutils";
-import { Alumni, Room, RoomInfo } from "../types/types";
+import { Alumni, RoomInfo } from "../types/types";
 
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);

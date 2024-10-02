@@ -8,7 +8,7 @@ interface RoomDetails {
 }
 
 export const getRoomDetails = async (_id: string) => {
-    const roomInfo = await fetch(`http://localhost:5000/api/getinfo/${_id}`, {
+    const roomInfo = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/getinfo/${_id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export const getRoomDetails = async (_id: string) => {
 
 export const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean): Promise<any> => {
     try {
-        const response = await fetch('http://localhost:5000/api/register', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -38,7 +38,8 @@ app.get('/api/available-rooms', async (req, res) => {
 app.post('/api/register',async (req, res) => {
       const {name, branch, rollNumber, email, roomLocation, roomName, meal} = req.body;
 
-      try {
+      if (roomName === '') {
+         try {
          const location = await locationSchema.findOne({ locationName: roomLocation });
          if (!location) {
             return res.status(400).json({ message: 'Invalid location' });
@@ -61,8 +62,11 @@ app.post('/api/register',async (req, res) => {
          await location.save();
          sendRoomAllocationEmail(email, name, roomLocation, roomName);
          res.status(201).json({ message: 'Alum registered successfully and mail sent successfully' });
-      } catch (error) {
-         res.status(500).json({ message: 'Could not register alum' });
+         } catch (error) {
+            res.status(500).json({ message: 'Could not register alum' });
+         }
+      } else {
+         res.status(400).json({ message: 'Already Registered' });
       }
 });
 
@@ -199,10 +203,10 @@ app.get('/api/getinfo/:id', async (req, res) => {
        const locations = await locationSchema.find();
          for(const location of locations){
             for(const room of location.rooms){
-               console.log(room._id.toString())
+               // console.log(room._id.toString())
 
                if(roomId === room._id.toString()){
-                  console.log('FOUND!!!!!!!')
+                  // console.log('FOUND!!!!!!!')
                }
             }
          }
