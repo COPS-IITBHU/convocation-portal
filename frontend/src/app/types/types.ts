@@ -9,9 +9,11 @@ export interface Alumni {
     password: string
 }
 export interface Room {
+    _id: string;
     roomName: string;
     capacity: number;
     occupants: Array<Alumni>;
+    roomDetails: string;
 }
 export interface RoomInfo {
     location: string;
