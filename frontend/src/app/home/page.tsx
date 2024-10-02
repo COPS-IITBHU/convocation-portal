@@ -12,12 +12,14 @@ import {
   Alert,
   AlertTitle,
   useMediaQuery,
+  Paper,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { LogOut } from "lucide-react";
+import { LogOut, Info } from "lucide-react";
 import Cookies from 'js-cookie'; 
 import { useRouter } from 'next/navigation';
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import Image from 'next/image';
 import RoomSection from "../components/roomsection";
 import { 
   handleOccupiedRooms,
@@ -25,6 +27,9 @@ import {
   handleUnoccupiedRooms,
 } from "../utils/homeutils";
 import { Alumni, RoomInfo } from "../types/types";
+import copsLogo from '../assets/COPS_LOGO (1).png';
+import sntcLogo from '../assets/image.png';
+import IITBHULOGO from '../assets/image (1).png';
 
 export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -46,6 +51,11 @@ export default function Home() {
     meal: false,
     password: ''
   });
+  const [roomInfo, setRoomInfo] = useState({
+    roomName: '',
+    roomLocation: '',
+    meal: false,
+  });
 
   const handleLogout = () => {
     Cookies.remove('token');
@@ -62,101 +72,303 @@ export default function Home() {
     setPartiallyOccupiedRoomsData(partiallyoccupiedroomsdata);
   };
 
+
   useEffect(() => {
-    if (token) {
-      const userdetails = jwtDecode(token) as { name: string; branch: string; rollNumber: string; email: string };
-      setAlumDetails((prev) => ({
-        ...prev,
-        name: userdetails.name,
-        branch: userdetails.branch,
-        rollNumber: userdetails.rollNumber,
-        email: userdetails.email,
-      }));
-    } else {
-      router.push('/');
-    }
+    const fetchAlumData = async () => {
+      if (token) {
+        try {
+          // Decode token to get user details
+          const userdetails = jwtDecode<{ 
+            name: string; 
+            branch: string; 
+            rollNumber: string; 
+            email: string; 
+          }>(token);
+  
+          // Update state with decoded details
+          setAlumDetails((prev) => ({
+            ...prev,
+            name: userdetails.name,
+            branch: userdetails.branch,
+            rollNumber: userdetails.rollNumber,
+            email: userdetails.email,
+          }));
+  
+          // Fetch room info using alumDetails
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/alum-room-info`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                name: userdetails.name,
+                branch: userdetails.branch,
+                rollNumber: userdetails.rollNumber,
+                email: userdetails.email,
+              }),
+            }
+          );
+  
+          if (!response.ok) {
+            throw new Error('Failed to fetch room info');
+          }
+  
+          const alumInfo = await response.json();
+  
+          // Update room info state
+          setRoomInfo({
+            roomName: alumInfo.roomName,
+            roomLocation: alumInfo.roomLocation,
+            meal: alumInfo.meal,
+          });
+        } catch (error) {
+          console.error('Error fetching alum details or room info:', error);
+        }
+      } else {
+        router.push('/');
+      }
+    };
+  
+    fetchAlumData();
     getRoomsData();
+  
   }, [token, router]);
+  
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: isSmallScreen ? 'column' : 'row', 
-        justifyContent: 'space-between', 
-        alignItems: isSmallScreen ? 'flex-start' : 'center', 
-        mb: 3,
-        gap: 2
-      }}>
-        <Typography variant="h4" component="h1" fontWeight="bold" className="text-black" sx={{ fontSize: isSmallScreen ? '1.5rem' : '2.125rem' }}>
-          Room Allotment Dashboard
-        </Typography>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: isSmallScreen ? 'column' : 'row',
-          alignItems: isSmallScreen ? 'flex-start' : 'center', 
-          gap: 2 
-        }}>
-          <Box textAlign={isSmallScreen ? 'left' : 'right'}>
-            <Typography variant="subtitle1" className="text-black">{alumDetails.name}</Typography>
-            <Typography variant="body2" className="text-black">{alumDetails.branch}</Typography>
-            <Typography variant="caption" className="text-black" sx={{ wordBreak: 'break-word' }}>
-              {alumDetails.email}
+    <Box
+      sx={{
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh',
+        width: '100%',
+        padding: '2rem',
+      }}
+    >
+      {/* Top Logos */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '2rem',
+          marginBottom: '2rem',
+          width: '100%',
+          maxWidth: '800px',
+          margin: '0 auto',
+        }}
+      >
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            width: '60%',
+          }}
+        >
+          <Image
+            src={sntcLogo}
+            alt="SNTC Logo"
+            width={400}
+            height={100}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+        <Box
+          sx={{
+            flex: '0 0 auto',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '40%',
+          }}
+        >
+          <Image
+            src={IITBHULOGO}
+            alt="IIT BHU Logo"
+            width={120}
+            height={120}
+            style={{ 
+              objectFit: 'contain',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
+        </Box>
+      </Box>
+
+      {/* Main Content */}
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Paper
+          elevation={4}
+          sx={{
+            borderRadius: '15px',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            padding: '2rem',
+            marginBottom: '2rem',
+          }}
+        >
+          {/* Header with User Info and Logout */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: isSmallScreen ? 'column' : 'row', 
+            justifyContent: 'space-between', 
+            alignItems: isSmallScreen ? 'flex-start' : 'center', 
+            mb: 3,
+            gap: 2
+          }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              sx={{ 
+                color: '#1a237e',
+                fontWeight: 'bold',
+                fontSize: isSmallScreen ? '1.5rem' : '2.125rem',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+              }}
+            >
+              Room Allotment Dashboard
             </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: isSmallScreen ? 'column' : 'row',
+              alignItems: isSmallScreen ? 'flex-start' : 'center', 
+              gap: 2 
+            }}>
+              <Box textAlign={isSmallScreen ? 'left' : 'right'}>
+                <Typography variant="subtitle1" sx={{ color: '#1a237e', fontWeight: '500' }}>
+                  {alumDetails.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#303f9f' }}>
+                  {alumDetails.branch}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#303f9f', wordBreak: 'break-word' }}>
+                  {alumDetails.email}
+                </Typography>
+              </Box>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<LogOut />}
+                onClick={() => setShowLogoutConfirm(true)}
+                sx={{ 
+                  height: 'fit-content',
+                  backgroundColor: '#1a237e',
+                  '&:hover': {
+                    backgroundColor: '#303f9f',
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
           </Box>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<LogOut />}
-            onClick={() => setShowLogoutConfirm(true)}
+
+          {/* Current Booking Alert */}
+          <Alert 
+            severity="info" 
+            icon={<Info />}
             sx={{ 
-              height: 'fit-content',
-              transition: 'background-color 0.3s',
-              '&:hover': { bgcolor: theme.palette.error.light }
+              mb: 3,
+              '& .MuiAlert-message': {
+                width: '100%'
+              }
+            }}
+          >
+            <AlertTitle>Your Current Booking</AlertTitle>
+            <Typography>
+              {roomInfo.roomLocation} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
+            </Typography>
+          </Alert>
+
+          {/* Room Sections */}
+          <Box sx={{ mb: 3 }}>
+            <RoomSection
+              title="Unoccupied Rooms"
+              roomsInfo={unoccupiedroomsdata}
+              alumni={alumDetails}
+            />
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <RoomSection
+              title="Partially Occupied Rooms"
+              roomsInfo={partiallyoccupiedroomsdata}
+              alumni={alumDetails}
+            />
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <RoomSection
+              title="Occupied Rooms"
+              roomsInfo={occupiedroomsdata}
+              alumni={alumDetails}
+            />
+          </Box>
+
+          {/* COPS Logo at Bottom */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mt: 4,
+            }}
+          >
+            <Image
+              src={copsLogo}
+              alt="COPS Logo"
+              width={100}
+              height={100}
+              style={{ 
+                objectFit: 'contain',
+                borderRadius: '2rem'
+              }}
+            />
+          </Box>
+        </Paper>
+      </Container>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog 
+        open={showLogoutConfirm} 
+        onClose={() => setShowLogoutConfirm(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '15px',
+            padding: '1rem',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#1a237e' }}>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: '#303f9f' }}>Are you sure you want to logout?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setShowLogoutConfirm(false)}
+            sx={{ color: '#303f9f' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleLogout} 
+            variant="contained" 
+            sx={{ 
+              backgroundColor: '#1a237e',
+              '&:hover': {
+                backgroundColor: '#303f9f',
+              },
             }}
           >
             Logout
           </Button>
-        </Box>
-      </Box>
-
-      {alumDetails.roomName !== '' && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <AlertTitle>Your Current Booking</AlertTitle>
-          <Typography>
-            You have booked a room in <strong>{alumDetails.roomLocation}</strong> with room name <strong>{alumDetails.roomName}</strong>.
-          </Typography>
-        </Alert>
-      )}
-
-      <RoomSection
-        title="Unoccupied Rooms"
-        roomsInfo={unoccupiedroomsdata}
-        alumni={alumDetails}
-      />
-
-      <RoomSection
-        title="Occupied Rooms"
-        roomsInfo={occupiedroomsdata}
-        alumni={alumDetails}
-      />
-
-      <RoomSection
-        title="Partially Occupied Rooms"
-        roomsInfo={partiallyoccupiedroomsdata}
-        alumni={alumDetails}
-      />
-
-      <Dialog open={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)}>
-        <DialogTitle>Confirm Logout</DialogTitle>
-        <DialogContent>
-          <Typography className="text-black">Are you sure you want to logout?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowLogoutConfirm(false)}>Cancel</Button>
-          <Button onClick={handleLogout} color="error" variant="contained">Logout</Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 }

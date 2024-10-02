@@ -1,12 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { locationSchema, Room } = require('./model');
+const { locationSchema, Room, Alum } = require('./model');
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { authRouter } = require('./auth');
 const cors = require('cors')
-
 
 const app = express();
 app.use(cors())
@@ -35,41 +34,63 @@ app.get('/api/available-rooms', async (req, res) => {
    }
 });
 
-app.post('/api/register',async (req, res) => {
-      const {name, branch, rollNumber, email, roomLocation, roomName, meal} = req.body;
-
-      if (roomName === '') {
-         try {
-         const location = await locationSchema.findOne({ locationName: roomLocation });
-         if (!location) {
-            return res.status(400).json({ message: 'Invalid location' });
-         }
-         const room = location.rooms.find(room => room.roomName === roomName);
-         if (!room || room.occupants.length >= room.capacity) {
-            return res.status(400).json({ message: 'Room is full or not found' });
-         }
-         const newAlum = {
-            name,
-            branch,
-            rollNumber,
-            email,
-            roomLocation,
-            roomName,
-            meal,
-         };
-
-         room.occupants.push(newAlum);
-         await location.save();
-         sendRoomAllocationEmail(email, name, roomLocation, roomName);
-         res.status(201).json({ message: 'Alum registered successfully and mail sent successfully' });
-         } catch (error) {
-            res.status(500).json({ message: 'Could not register alum' });
-         }
-      } else {
-         res.status(400).json({ message: 'Already Registered' });
-      }
-});
-
+app.post('/api/register', async (req, res) => {
+   const { name, branch, rollNumber, email, roomLocation, roomName, meal } = req.body;
+ 
+   try {
+     // Check if an alum with the same roll number or email already exists
+     const existingAlum = await Alum.findOne({ $or: [{ rollNumber }, { email }] });
+     if (existingAlum) {
+       return res.status(409).json({ message: 'Alum already registered with the same roll number or email.' });
+     }
+ 
+     // Validate location
+     const location = await locationSchema.findOne({ locationName: roomLocation });
+     if (!location) {
+       return res.status(400).json({ message: 'Invalid location.' });
+     }
+ 
+     // Validate room
+     const room = location.rooms.find(room => room.roomName === roomName);
+     if (!room) {
+       return res.status(400).json({ message: 'Room not found.' });
+     }
+ 
+     // Check if the room is full
+     if (room.occupants.length >= room.capacity) {
+       return res.status(400).json({ message: 'Room is full.' });
+     }
+ 
+     // Prepare new alum object
+     const newAlum = {
+       name,
+       branch,
+       rollNumber,
+       email,
+       roomLocation,
+       roomName,
+       meal,
+     };
+ 
+     // Insert the new alum
+     await Alum.create(newAlum);
+ 
+     // Add the alum to room occupants
+     room.occupants.push(newAlum);
+     await location.save();
+ 
+     // Send room allocation email
+     sendRoomAllocationEmail(email, name, roomLocation, roomName);
+ 
+     // Send success response
+     return res.status(201).json({ message: 'Alum registered successfully and email sent.' });
+ 
+   } catch (error) {
+     console.error('Error registering alum:', error);
+     return res.status(500).json({ message: 'Server error. Could not register alum.' });
+   }
+ });
+ 
 app.post('/api/initializelocations', async (req, res) => {
    try {
       await locationSchema.deleteMany({});
@@ -232,6 +253,27 @@ app.get('/api/getinfo/:id', async (req, res) => {
    }
 });
 
+app.post('/alum-room-info', async (req, res) => {
+   const { name, branch, rollNumber, email } = req.body;
+ 
+   try {
+     // Find alum matching all four fields
+     const alum = await Alum.findOne({ name, branch, rollNumber, email });
+ 
+     // If no alum is found, return 404
+     if (!alum) {
+       return res.status(404).json({ message: 'Alum not found with the provided details.' });
+     }
+ 
+     // If alum is found, return the alum details
+     return res.status(200).json(alum);
+     
+   } catch (error) {
+     console.error('Error fetching alum info:', error);
+     return res.status(500).json({ message: 'Server error. Could not retrieve alum information.' });
+   }
+ });
+ 
 
 
 const transporter = nodemailer.createTransport({
