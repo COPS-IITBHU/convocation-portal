@@ -1,6 +1,6 @@
 const express = require('express');
 const authRouter = express.Router();
-const { Alum } = require('./model');
+const { User } = require('./model');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
@@ -25,12 +25,12 @@ authRouter.post('/register', async (req, res) => {
 
         const password = await bcrypt.hash(unhashedPassword, 10);
 
-        const existingUser = await Alum.findOne({ email });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: "User already registered" });
         }
 
-        const newUser = new Alum({
+        const newUser = new User({
             email,
             password,
             name,
@@ -54,7 +54,7 @@ authRouter.post('/register', async (req, res) => {
 authRouter.post('/login' , async (req, res) => {
     try{
         const { email, unhashedPassword } = req.body
-        const user = await Alum.findOne({
+        const user = await User.findOne({
             email
         })
 

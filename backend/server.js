@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { locationSchema, Room, Alum } = require('./model');
+const { locationSchema, Room, Alum, User } = require('./model');
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { authRouter } = require('./auth');
@@ -39,10 +39,10 @@ app.post('/api/register', async (req, res) => {
  
    try {
      // Check if an alum with the same roll number or email already exists
-   //   const existingAlum = await Alum.findOne({ $or: [{ rollNumber }, { email }] });
-   //   if (existingAlum) {
-   //     return res.status(409).json({ message: 'Alum already registered with the same roll number or email.' });
-   //   }
+     const existingAlum = await Alum.findOne({ $or: [{ rollNumber }, { email }] });
+     if (existingAlum) {
+       return res.status(409).json({ message: 'You have already booked a room.' });
+     }
  
      // Validate location
      const location = await locationSchema.findOne({ locationName: roomLocation });
@@ -72,7 +72,6 @@ app.post('/api/register', async (req, res) => {
        meal,
      };
 
-   await Alum.deleteMany({ $or: [{ rollNumber }, { email }] });
    await Alum.create(newAlum);
    console.log('Alum registered successfully:', newAlum);
          
@@ -119,6 +118,14 @@ app.post('/api/initializelocations', async (req, res) => {
                { roomName: 'C102', capacity: 2, occupants: [] },
                { roomName: 'C103', capacity: 2, occupants: [] },
             ]
+         },
+         {
+            locationName: 'Common Rooms',
+            rooms: [
+               { roomName: 'Ramanujan Hostel', capacity: 30, occupants: [] },
+               { roomName: 'Aryabhatta hostel', capacity: 30, occupants: [] },
+               { roomName: 'Satish Dhawan Hostel', capacity: 60, occupants: [] },
+            ] 
          }
       ];
       await locationSchema.insertMany(predefinedLocations);
@@ -309,6 +316,24 @@ app.get('/api/clean-alums', async (req, res) => {
       res.status(200).json({ message: 'Alums cleaned successfully' });
    } catch (error) {
       res.status(500).json({ message: 'Could not clean alums' });
+   }
+});
+
+app.get('/api/all-users', async (req, res) => {
+   try {
+      const users = await User.find();
+      res.status(200).json(users);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch users' });
+   }
+});
+
+app.get('/api/clean-users', async (req, res) => {
+   try {
+      await User.deleteMany();
+      res.status(200).json({ message: 'Users cleaned successfully' });
+   } catch (error) {
+      res.status(500).json({ message: 'Could not clean users' });
    }
 });
  

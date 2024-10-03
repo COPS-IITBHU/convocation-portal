@@ -7,8 +7,15 @@ const alumSchema = new mongoose.Schema({
    email: String,
    roomLocation: String,
    roomName: String,
-   meal: Boolean,
-   password: String
+   meal: Boolean
+});
+
+const userSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    branch: String,
+    rollNumber: String,
+    password: String,
 });
 
 const roomSchema = new mongoose.Schema({
@@ -25,6 +32,7 @@ const locationSchema = mongoose.model('Locations', new mongoose.Schema({
 
 const Alum = mongoose.model('Alum' , alumSchema)
 const Room = mongoose.model('Room', roomSchema)
+const User = mongoose.model('User', userSchema)
 
-module.exports = { alumSchema, roomSchema, locationSchema, Alum, Room };
+module.exports = { alumSchema, roomSchema, locationSchema, Alum, Room, User };
 
