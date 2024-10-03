@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -18,16 +18,11 @@ import { useTheme } from '@mui/material/styles';
 import { LogOut, Info } from "lucide-react";
 import Cookies from 'js-cookie'; 
 import { useRouter } from 'next/navigation';
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Image from 'next/image';
 import RoomSection from "../components/roomsection";
-import { 
-  handleOccupiedRooms,
-  handlePartiallyOccupiedRooms, 
-  handleUnoccupiedRooms,
-} from "../utils/homeutils";
+import { handleOccupiedRooms, handlePartiallyOccupiedRooms, handleUnoccupiedRooms } from "../utils/homeutils";
 import { Alumni, RoomInfo } from "../types/types";
-// import copsLogo from '../assets/COPS_LOGO (1).png';
 import sntcLogo from '../assets/image.png';
 import IITBHULOGO from '../assets/image (1).png';
 
@@ -36,8 +31,8 @@ export default function Home() {
   const [unoccupiedroomsdata, setUnoccupiedRoomsData] = useState<RoomInfo[]>([]);
   const [occupiedroomsdata, setOccupiedRoomsData] = useState<RoomInfo[]>([]);
   const [partiallyoccupiedroomsdata, setPartiallyOccupiedRoomsData] = useState<RoomInfo[]>([]);
-  // const [isToastOpen, setIsToastOpen] = useState(false);
-  // const [error, setError] = useState('');
+  const [error, setError] = useState('');
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
@@ -53,6 +48,7 @@ export default function Home() {
     meal: false,
     password: ''
   });
+
   const [roomInfo, setRoomInfo] = useState({
     roomName: '',
     roomLocation: '',
@@ -66,20 +62,24 @@ export default function Home() {
   };
 
   const getRoomsData = async (): Promise<void> => {
-    const unoccupiedroomsdata = await handleUnoccupiedRooms();
-    const occupiedroomsdata = await handleOccupiedRooms();
-    const partiallyoccupiedroomsdata = await handlePartiallyOccupiedRooms();
-    setUnoccupiedRoomsData(unoccupiedroomsdata);
-    setOccupiedRoomsData(occupiedroomsdata);
-    setPartiallyOccupiedRoomsData(partiallyoccupiedroomsdata);
+    try {
+      const unoccupiedroomsdata = await handleUnoccupiedRooms();
+      const occupiedroomsdata = await handleOccupiedRooms();
+      const partiallyoccupiedroomsdata = await handlePartiallyOccupiedRooms();
+      setUnoccupiedRoomsData(unoccupiedroomsdata);
+      setOccupiedRoomsData(occupiedroomsdata);
+      setPartiallyOccupiedRoomsData(partiallyoccupiedroomsdata);
+    } catch (error) {
+      console.error('Error fetching room data:', error);
+      setError('Failed to fetch room data. Please try again later.');
+      setIsToastOpen(true);
+    }
   };
-
 
   useEffect(() => {
     const fetchAlumData = async () => {
       if (token) {
         try {
-          // Decode token to get user details
           const userdetails = jwtDecode<{ 
             name: string; 
             branch: string; 
@@ -87,7 +87,6 @@ export default function Home() {
             email: string; 
           }>(token);
   
-          // Update state with decoded details
           setAlumDetails((prev) => ({
             ...prev,
             name: userdetails.name,
@@ -95,8 +94,7 @@ export default function Home() {
             rollNumber: userdetails.rollNumber,
             email: userdetails.email,
           }));
-  
-          // Fetch room info using alumDetails
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/alum-room-info`,
             {
@@ -112,14 +110,12 @@ export default function Home() {
               }),
             }
           );
-  
+
           if (!response.ok) {
             throw new Error('Failed to fetch room info');
           }
-  
+
           const alumInfo = await response.json();
-  
-          // Update room info state
           setRoomInfo({
             roomName: alumInfo.roomName,
             roomLocation: alumInfo.roomLocation,
@@ -127,17 +123,18 @@ export default function Home() {
           });
         } catch (error) {
           console.error('Error fetching alum details or room info:', error);
+          setError('Failed to fetch alum details or room info. Please try again later.');
+          setIsToastOpen(true);
         }
       } else {
         router.push('/');
       }
     };
-  
+
     fetchAlumData();
     getRoomsData();
   
   }, [token, router]);
-  
 
   return (
     <Box
@@ -148,9 +145,11 @@ export default function Home() {
         padding: '2rem',
       }}
     >
-      {/* {isToastOpen && <Alert variant="filled" severity="error">
-        {error}
-      </Alert>} */}
+      {isToastOpen && (
+        <Alert variant="filled" severity="error" onClose={() => setIsToastOpen(false)}>
+          {error}
+        </Alert>
+      )}
       {/* Top Logos */}
       <Box
         sx={{
@@ -292,74 +291,22 @@ export default function Home() {
 
           {/* Room Sections */}
           <Box sx={{ mb: 3 }}>
-            <RoomSection
-              title="Unoccupied Rooms"
-              roomsInfo={unoccupiedroomsdata}
-            />
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <RoomSection
-              title="Partially Occupied Rooms"
-              roomsInfo={partiallyoccupiedroomsdata}
-            />
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <RoomSection
-              title="Occupied Rooms"
-              roomsInfo={occupiedroomsdata}
-            />
-          </Box>
-
-          {/* COPS Logo at Bottom */}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 4,
-            }}
-          >
-            Made with ❤️ by COPS
+            <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
+            <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
+            <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
           </Box>
         </Paper>
       </Container>
 
       {/* Logout Confirmation Dialog */}
-      <Dialog 
-        open={showLogoutConfirm} 
-        onClose={() => setShowLogoutConfirm(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: '15px',
-            padding: '1rem',
-          }
-        }}
-      >
-        <DialogTitle sx={{ color: '#1a237e' }}>Confirm Logout</DialogTitle>
+      <Dialog open={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)}>
+        <DialogTitle>Confirm Logout</DialogTitle>
         <DialogContent>
-          <Typography sx={{ color: '#303f9f' }}>Are you sure you want to logout?</Typography>
+          <Typography>Are you sure you want to logout?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button 
-            onClick={() => setShowLogoutConfirm(false)}
-            sx={{ color: '#303f9f' }}
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleLogout} 
-            variant="contained" 
-            sx={{ 
-              backgroundColor: '#1a237e',
-              '&:hover': {
-                backgroundColor: '#303f9f',
-              },
-            }}
-          >
-            Logout
-          </Button>
+          <Button onClick={() => setShowLogoutConfirm(false)}>Cancel</Button>
+          <Button onClick={handleLogout} color="primary">Logout</Button>
         </DialogActions>
       </Dialog>
     </Box>
