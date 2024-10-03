@@ -4,7 +4,6 @@ import {
     Typography,
     Paper,
     Grid,
-    Alert,
     List,
     ListItem,
     ListItemIcon,
@@ -28,8 +27,8 @@ import { useRouter } from 'next/navigation';
 const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[] }) => {
     const router = useRouter();
     const token = Cookies.get('token');
-    const [error, setError] = useState<string | null>(null);
-    const [isToastOpen, setIsToastOpen] = useState(false);
+    // const [error, setError] = useState<string | null>(null);
+    // const [isToastOpen, setIsToastOpen] = useState(false);
 
     const [alumDetails, setAlumDetails] = useState<Alumni>({
         name: '',
