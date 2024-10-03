@@ -10,6 +10,7 @@ import {
   InputAdornment,
   IconButton,
   Paper,
+  Alert
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
@@ -24,6 +25,8 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,9 +59,13 @@ export default function SignIn() {
         router.push('/home');
       } else {
         console.error('Login failed');
+        setError('Invalid email or password.');
+        setIsToastOpen(true);
       }
     } catch (error) {
       console.error('Login error:', error);
+      setError('Something went wrong. Please try again later.');
+      setIsToastOpen(true);
     }
   };
 
@@ -75,6 +82,9 @@ export default function SignIn() {
       }}
     >
       {/* Updated Top Logos Container */}
+      {isToastOpen && <Alert variant="filled" severity="error">
+        {error}
+      </Alert>}
       <Box
         sx={{
           display: 'flex',

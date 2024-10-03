@@ -4,6 +4,7 @@ import {
     Typography,
     Paper,
     Grid,
+    Alert,
     List,
     ListItem,
     ListItemIcon,
@@ -27,6 +28,8 @@ import { useRouter } from 'next/navigation';
 const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[] }) => {
     const router = useRouter();
     const token = Cookies.get('token');
+    const [error, setError] = useState<string | null>(null);
+    const [isToastOpen, setIsToastOpen] = useState(false);
 
     const [alumDetails, setAlumDetails] = useState<Alumni>({
         name: '',
@@ -76,6 +79,7 @@ const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[]
         if (selectedRoom && details) {
             await handleRoomBooking(alumDetails, details.roomLocation, details.roomName, isMess);
             handleClose(); // Optionally close the dialog after booking
+            router.push('/home');
         }
     };
 

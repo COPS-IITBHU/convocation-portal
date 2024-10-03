@@ -12,7 +12,7 @@ import {
   Alert,
   AlertTitle,
   useMediaQuery,
-  Paper,
+  Paper
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LogOut, Info } from "lucide-react";
@@ -36,6 +36,8 @@ export default function Home() {
   const [unoccupiedroomsdata, setUnoccupiedRoomsData] = useState<RoomInfo[]>([]);
   const [occupiedroomsdata, setOccupiedRoomsData] = useState<RoomInfo[]>([]);
   const [partiallyoccupiedroomsdata, setPartiallyOccupiedRoomsData] = useState<RoomInfo[]>([]);
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [error, setError] = useState('');
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
@@ -146,6 +148,9 @@ export default function Home() {
         padding: '2rem',
       }}
     >
+      {isToastOpen && <Alert variant="filled" severity="error">
+        {error}
+      </Alert>}
       {/* Top Logos */}
       <Box
         sx={{

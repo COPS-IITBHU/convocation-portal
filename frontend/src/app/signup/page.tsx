@@ -12,7 +12,8 @@ import {
   Select,
   MenuItem,
   Box,
-  Paper
+  Paper,
+  Alert
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
@@ -24,6 +25,8 @@ import IITBHULOGO from '../assets/image (1).png';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isToastOpen, setIsToastOpen] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -68,9 +71,13 @@ export default function SignUp() {
         router.push('/home');
       } else {
         console.error('Registration failed:', data.message);
+        setError(data.message);
+        setIsToastOpen(true);
       }
     } catch (error) {
       console.error('Error during registration:', error);
+      setError('Something went wrong. Please try again later.');
+      setIsToastOpen(true);
     }
   };
 
@@ -86,6 +93,9 @@ export default function SignUp() {
         padding: '2rem',
       }}
     >
+      {isToastOpen && <Alert variant="filled" severity="error">
+        {error}
+      </Alert>}
       <Box
         sx={{
           display: 'flex',
