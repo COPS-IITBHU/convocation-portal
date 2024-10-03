@@ -289,11 +289,17 @@ export default function Home() {
             </Typography>
           </Alert>
 
-          {/* Room Sections */}
+          {/* Room Sections Wrapped in Boxes */}
           <Box sx={{ mb: 3 }}>
-            <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
-            <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
-            <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
+            <Box sx={{ mb: 2 }}>
+              <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
+            </Box>
           </Box>
         </Paper>
       </Container>
