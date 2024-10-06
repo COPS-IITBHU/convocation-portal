@@ -14,6 +14,7 @@ import {
     DialogActions,
     Button,
     Switch,
+    Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ChevronRight } from "lucide-react";
@@ -24,11 +25,9 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
 
-const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[] }) => {
+const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[] }) => {
     const router = useRouter();
     const token = Cookies.get('token');
-    // const [error, setError] = useState<string | null>(null);
-    // const [isToastOpen, setIsToastOpen] = useState(false);
 
     const [alumDetails, setAlumDetails] = useState<Alumni>({
         name: '',
@@ -42,27 +41,31 @@ const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[]
     });
 
     const theme = useTheme();
-    // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
     const [open, setOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [details, setDetails] = useState<{ numberOfOccupants: number; roomCapacity: number; roomLocation: string; roomName: string; meal: boolean; } | null>(null);
     const [isMess, setIsMess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isToastOpen, setIsToastOpen] = useState(false);
 
     const handleClickOpen = async (room: Room) => {
         setSelectedRoom(room);
         setOpen(true);
-    
-        const roomDetails = await getRoomDetails(room._id);
-    
-        if (roomDetails) {
-            setDetails(roomDetails);
-        } else {
-            console.error("Failed to fetch room details.");
+
+        try {
+            const roomDetails = await getRoomDetails(room._id);
+            if (roomDetails) {
+                setDetails(roomDetails);
+            } else {
+                console.error("Failed to fetch room details.");
+                setDetails(null);
+            }
+        } catch (error) {
+            console.error("Error fetching room details:", error);
             setDetails(null);
         }
     };
-    
+
     const handleClose = () => {
         setOpen(false);
         setSelectedRoom(null);
@@ -76,10 +79,29 @@ const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[]
 
     const handleBookRoom = async () => {
         if (selectedRoom && details) {
-            await handleRoomBooking(alumDetails, details.roomLocation, details.roomName, isMess);
-            handleClose(); // Optionally close the dialog after booking
-            router.push('/home');
+            try {
+                const bookingResponse = await handleRoomBooking(alumDetails, details.roomLocation, details.roomName, isMess);
+
+                if (!bookingResponse) {
+                    setError("You can only book one room at a time.");
+                } else {
+                    handleClose(); // Close the dialog after successful booking
+                    router.push('/home');
+                    return; // Exit the function after successful booking
+                }
+
+                setIsToastOpen(true); // Show toast for errors
+            } catch (error) {
+                console.error("Error during room booking:", error);
+                setError("Failed to book the room. Please try again.");
+                setIsToastOpen(true);
+            }
         }
+    };
+
+    const handleCloseToast = () => {
+        setIsToastOpen(false);
+        setError(null);
     };
 
     useEffect(() => {
@@ -163,6 +185,13 @@ const RoomSection = ({ title, roomsInfo}: { title: string; roomsInfo: RoomInfo[]
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={isToastOpen}
+                autoHideDuration={6000}
+                onClose={handleCloseToast}
+                message={error}
+            />
         </Box>
     );
 };
