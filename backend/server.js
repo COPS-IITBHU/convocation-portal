@@ -96,37 +96,38 @@ app.post('/api/initializelocations', async (req, res) => {
       await locationSchema.deleteMany({});
       const predefinedLocations = [
          {
-            locationName: 'Aryabhatta Hostel',
+            locationName: 'Common Rooms (Boys)',
             rooms: [
-               { roomName: 'A101', capacity: 2, occupants: [] },
-               { roomName: 'A102', capacity: 2, occupants: [] },
-               { roomName: 'A103', capacity: 2, occupants: [] },
+               { roomName: 'C.V. Raman Hostel', capacity: 40, occupants: [] },
+               { roomName: 'Morvi Hostel', capacity: 40, occupants: [] },
+               { roomName: 'Dhanrajgiri Hostel', capacity: 64, occupants: [] },
+               { roomName: 'Rajputana Hostel', capacity: 40, occupants: [] },
+               { roomName: 'Vivekananda Hostel', capacity: 40, occupants: [] },
+               { roomName: 'Vishwakarma Hostel', capacity: 40, occupants: [] },
+               { roomName: 'Vishweshwaraiya Hostel', capacity: 100, occupants: [] },
+               { roomName: 'A.S.N. Bose Hostel', capacity: 24, occupants: [] },
+               { roomName: 'Satish Dhawan Hostel', capacity: 100, occupants: [] },
+               { roomName: 'P.C. Ray Hostel', capacity: 150, occupants: [] },
             ]
          },
          {
-            locationName: 'Ramanujan Hostel',
+            locationName: 'Normal Rooms (Boys)',
             rooms: [
-               { roomName: 'B101', capacity: 2, occupants: [] },
-               { roomName: 'B102', capacity: 2, occupants: [] },
-               { roomName: 'B103', capacity: 2, occupants: [] },
+               { roomName: 'Morvi Hostel', capacity: 200, occupants: [] },
+               { roomName: 'Dhanrajgiri Hostel', capacity: 36, occupants: [] },
+               { roomName: 'Vivekananda Hostel', capacity: 60, occupants: [] },
+               { roomName: 'A.S.N. Bose Hostel', capacity: 36, occupants: [] },
             ]
          },
          {
-            locationName: 'Dhanrajgiri Hostel',
+            locationName: 'Common Rooms (Girls)',
             rooms: [
-               { roomName: 'C101', capacity: 2, occupants: [] },
-               { roomName: 'C102', capacity: 2, occupants: [] },
-               { roomName: 'C103', capacity: 2, occupants: [] },
+               { roomName: 'Limbdi Hostel', capacity: 40, occupants: [] },
+               { roomName: 'S.C. Dey Hostel', capacity: 40, occupants: [] },
+               { roomName: 'G.S.M.C. Hostel', capacity: 100, occupants: [] },
+               { roomName: 'Nivedita Hostel', capacity: 100, occupants: [] },
             ]
          },
-         {
-            locationName: 'Common Rooms',
-            rooms: [
-               { roomName: 'Ramanujan Hostel', capacity: 30, occupants: [] },
-               { roomName: 'Aryabhatta hostel', capacity: 30, occupants: [] },
-               { roomName: 'Satish Dhawan Hostel', capacity: 60, occupants: [] },
-            ] 
-         }
       ];
       await locationSchema.insertMany(predefinedLocations);
       res.status(200).json({ message: 'Locations initialized successfully' });
