@@ -26,7 +26,7 @@ import IITBHULOGO from '../assets/image (1).png';
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isToastOpen, setIsToastOpen] = useState(true);
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -224,6 +224,15 @@ export default function SignUp() {
               <MenuItem value="Electronics Engineering">Electronics</MenuItem>
               <MenuItem value="Mechanical Engineering">Mechanical</MenuItem>
               <MenuItem value="Civil Engineering">Civil</MenuItem>
+              <MenuItem value="Mathematics and Computing">Maths and Computing</MenuItem>
+              <MenuItem value="Electrical Engineering">Electrical</MenuItem>
+              <MenuItem value="Chemical Engineering">Chemical</MenuItem>
+              <MenuItem value="Metallurgical Engineering">Metallurgy</MenuItem>
+              <MenuItem value="Mining Engineering">Mining</MenuItem>
+              <MenuItem value="Ceramic Engineering">Ceramic</MenuItem>
+              <MenuItem value="Biomedical Engineering">Biomedical</MenuItem>
+              <MenuItem value="Biochemical Engineering">Biochemical</MenuItem>
+              <MenuItem value="Engineering Physics">Engineering Physics</MenuItem>
             </Select>
           </FormControl>
 
