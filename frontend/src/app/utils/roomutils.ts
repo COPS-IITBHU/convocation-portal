@@ -8,21 +8,22 @@ export const getRoomDetails = async (_id: string) => {
         },
     });
 
+    if (!roomInfo.ok) {
+        throw new Error(`Error fetching room details: ${roomInfo.statusText}`);
+    }
+
     const roomInfoParsed = await roomInfo.json();
     
-    console.log(roomInfoParsed)
+    console.log(roomInfoParsed);
     
-    // Ensure this return includes meal if it's needed.
     const numberOfOccupants = roomInfoParsed.numberOfOccupants;
     const roomCapacity = roomInfoParsed.roomCapacity;
     const roomName = roomInfoParsed.roomName;
     const roomLocation = roomInfoParsed.roomLocation;
-    const meal = false;
+    const meal = false; // Ensure this return includes meal if it's needed.
 
     return { numberOfOccupants, roomCapacity, roomName, roomLocation, meal };
 }
-
-
 
 export const handleRoomBooking = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean): Promise<any> => {
     try {
@@ -53,7 +54,7 @@ export const handleRoomBooking = async (alumDetails: Alumni, roomLocation: strin
 
         return bookingData;
     } catch (error) {
-        console.error(error);
+        console.error('Error in room booking:', error);
         return null;
     }
 };
