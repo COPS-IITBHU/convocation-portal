@@ -233,6 +233,11 @@ export default function SignUp() {
               <MenuItem value="Biomedical Engineering">Biomedical</MenuItem>
               <MenuItem value="Biochemical Engineering">Biochemical</MenuItem>
               <MenuItem value="Engineering Physics">Engineering Physics</MenuItem>
+              <MenuItem value="Pharmaceutical Engineering">Pharmaceutical Engineering</MenuItem>
+              <MenuItem value="School of Material Sciences and Technology">School of Material Sciences and Technology</MenuItem>
+              <MenuItem value="Architecture Planning and Design">Architecture Planning and Design</MenuItem>
+              {/* <MenuItem value="" */}
+
             </Select>
           </FormControl>
 
