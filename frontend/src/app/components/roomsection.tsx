@@ -20,7 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import { ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { RoomInfo, Alumni, Room } from '../types/types';
-import { getRoomDetails, handleRoomBooking } from '../utils/roomutils';
+import { getRoomDetails, handleRoomBooking, handleImage } from '../utils/roomutils';
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
@@ -41,12 +41,15 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
     });
 
     const theme = useTheme();
+    const [base64String, setBase64String] = useState<string>("")
     const [open, setOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [details, setDetails] = useState<{ numberOfOccupants: number; roomCapacity: number; roomLocation: string; roomName: string; meal: boolean; } | null>(null);
     const [isMess, setIsMess] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isToastOpen, setIsToastOpen] = useState(false);
+    const [imageError, setImageError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
     const handleClickOpen = async (room: Room) => {
         setSelectedRoom(room);
@@ -71,16 +74,48 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
         setSelectedRoom(null);
         setDetails(null); 
         setIsMess(false); 
+        setSelectedImage(null);
+        setImageError(null);
     };
 
     const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsMess(event.target.checked);
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const fileType = file.type;
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    
+            if (!allowedTypes.includes(fileType)) {
+                setImageError("Only .png, .jpeg, and .jpg files are allowed.");
+                setSelectedImage(null);
+            } else {
+                setImageError(null);
+                setSelectedImage(file);
+    
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    setBase64String(base64String)
+                    console.log('Base64 Image String:', base64String);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    };
+    
+
     const handleBookRoom = async () => {
         if (selectedRoom && details) {
+            if (!selectedImage) {
+                setImageError("Please upload an image before booking.");
+                return;
+            }
+
             try {
-                const bookingResponse = await handleRoomBooking(alumDetails, details.roomLocation, details.roomName, isMess);
+                const bookingResponse = await handleImage(alumDetails, details.roomLocation, details.roomName, isMess, base64String);
 
                 if (!bookingResponse) {
                     setError("You can only book one room at a time.");
@@ -102,6 +137,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
     const handleCloseToast = () => {
         setIsToastOpen(false);
         setError(null);
+        setImageError(null);
     };
 
     useEffect(() => {
@@ -173,6 +209,24 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                                     inputProps={{ 'aria-label': 'toggle mess preference' }}
                                 />
                             </Box>
+
+                            {/* Image Upload Section */}
+                            <Box mt={2}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Upload an image (only .png, .jpeg, .jpg):
+                                </Typography>
+                                <input
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    style={{ marginTop: '10px' }}
+                                />
+                                {imageError && (
+                                    <Typography color="error" variant="body2" mt={1}>
+                                        {imageError}
+                                    </Typography>
+                                )}
+                            </Box>
                         </Box>
                     )}
                 </DialogContent>
@@ -180,7 +234,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                     <Button onClick={handleClose} color="primary">
                         Close
                     </Button>
-                    <Button onClick={handleBookRoom} color="primary" disabled={!details}>
+                    <Button onClick={handleBookRoom} color="primary" disabled={!details || !!imageError}>
                         Book Room
                     </Button>
                 </DialogActions>
@@ -190,7 +244,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                 open={isToastOpen}
                 autoHideDuration={6000}
                 onClose={handleCloseToast}
-                message={error}
+                message={error || imageError}
             />
         </Box>
     );

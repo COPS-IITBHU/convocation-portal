@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 const bodyParser = require('body-parser');
 const { locationSchema, Room, Alum, User } = require('./model');
 require('dotenv').config();
@@ -365,6 +367,46 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
       }
    });
 };
+
+
+
+app.post('/api/image-handling', async (req, res) => {
+    const { name, branch, rollNumber, email, roomLocation, roomName, meal, base64String } = req.body;
+    
+    try {
+        if (!base64String) {
+            return res.status(400).json({ message: 'No image data provided' });
+        }
+
+        const imageBuffer = Buffer.from(base64String.split(",")[1], 'base64'); // Remove the metadata (e.g., "data:image/png;base64,")
+        const imageName = `${rollNumber}-${roomName}.png`; // Generate a unique image name
+        const imagePath = path.join(__dirname, 'uploads', imageName); // Define the path where image will be saved
+        
+        // Ensure the uploads directory exists
+        if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
+            fs.mkdirSync(path.join(__dirname, 'uploads'));
+        }
+
+        // Save the image to the file system
+        fs.writeFile(imagePath, imageBuffer, (err) => {
+            if (err) {
+                console.error('Error saving image:', err);
+                return res.status(500).json({ message: 'Error saving image' });
+            }
+
+            // Send a success response
+            return res.status(200).json({
+                message: 'Alum registered and image saved successfully',
+                imagePath,
+            });
+        });
+    } catch (error) {
+        console.error('Error dealing with image:', error);
+        return res.status(500).json({ message: 'Server error. Could not register alum.' });
+    }
+});
+
+
 
 app.listen(5000, () => {
    console.log('Server running on port 5000');
