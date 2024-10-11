@@ -368,42 +368,69 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
    });
 };
 
-
+const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber, imagePath) => {
+   const mailOptions = {
+      from: 'noreply@yourdomain.com',
+      to: 'shivansh111sid@gmail.com',
+      subject: 'Room Allocation Confirmation',
+      html: `<p>Please Verify The Room Details of the following Applicant:</p>
+               <p>Name: ${name}</p> 
+               <p>Location: ${roomLocation}</p>
+               <p>Room: ${roomName}</p>
+               <p>Branch: ${branch}</p>
+               <p>Roll Number: ${rollNumber}</p>
+               <img src="cid:screenshot"/>`,
+                  attachments: [{
+                     filename: 'screenshot.png',
+                     path: imagePath,
+                     cid: 'screenshot' // same cid value as in the html img src
+                  }]
+   };
+   transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+         console.log(error);
+      } else {
+         console.log('Email sent: ' + info.response);
+      }
+   });
+};
 
 app.post('/api/image-handling', async (req, res) => {
-    const { name, branch, rollNumber, email, roomLocation, roomName, meal, base64String } = req.body;
-    
-    try {
-        if (!base64String) {
-            return res.status(400).json({ message: 'No image data provided' });
-        }
+   const { name, branch, rollNumber, roomLocation, roomName, base64String } = req.body;
+   
+   try {
+      if (!base64String) {
+         return res.status(400).json({ message: 'No image data provided' });
+      }
 
-        const imageBuffer = Buffer.from(base64String.split(",")[1], 'base64'); // Remove the metadata (e.g., "data:image/png;base64,")
-        const imageName = `${rollNumber}-${name}.png`; // Generate a unique image name
-        const imagePath = path.join(__dirname, 'uploads', imageName); // Define the path where image will be saved
-        
-        // Ensure the uploads directory exists
-        if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-            fs.mkdirSync(path.join(__dirname, 'uploads'));
-        }
+      const imageBuffer = Buffer.from(base64String.split(",")[1], 'base64'); // Remove the metadata (e.g., "data:image/png;base64,")
+      const imageName = `${rollNumber}-${name}.png`; // Generate a unique image name
+      const imagePath = path.join(__dirname, 'uploads', imageName); // Define the path where image will be saved
+      
+      // Ensure the uploads directory exists
+      if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
+         fs.mkdirSync(path.join(__dirname, 'uploads'));
+      }
 
-        // Save the image to the file system
-        fs.writeFile(imagePath, imageBuffer, (err) => {
-            if (err) {
-                console.error('Error saving image:', err);
-                return res.status(500).json({ message: 'Error saving image' });
-            }
+      // Save the image to the file system
+      fs.writeFile(imagePath, imageBuffer, (err) => {
+         if (err) {
+            console.error('Error saving image:', err);
+            return res.status(500).json({ message: 'Error saving image' });
+         }
 
-            // Send a success response
-            return res.status(200).json({
-                message: 'Alum registered and image saved successfully',
-                imagePath,
-            });
+         // Send a success response
+          return res.status(200).json({
+            message: 'Alum registered and image saved successfully',
+            imagePath: `/uploads/${imageName}`, // Correct the imagePath to be relative
+          });
         });
-    } catch (error) {
-        console.error('Error dealing with image:', error);
-        return res.status(500).json({ message: 'Server error. Could not register alum.' });
-    }
+        sendMailToAdmin(name, roomLocation, roomName, branch, rollNumber, path.join(__dirname, 'uploads', imageName)); // Use absolute path for sending email
+      //   console.log(path.join(__dirname, 'uploads', imageName));
+   } catch (error) {
+      console.error('Error dealing with image:', error);
+      return res.status(500).json({ message: 'Server error. Could not register alum.' });
+   }
 });
 
 
