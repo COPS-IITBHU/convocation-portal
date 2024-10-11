@@ -379,7 +379,7 @@ app.post('/api/image-handling', async (req, res) => {
         }
 
         const imageBuffer = Buffer.from(base64String.split(",")[1], 'base64'); // Remove the metadata (e.g., "data:image/png;base64,")
-        const imageName = `${rollNumber}-${roomName}.png`; // Generate a unique image name
+        const imageName = `${rollNumber}-${name}.png`; // Generate a unique image name
         const imagePath = path.join(__dirname, 'uploads', imageName); // Define the path where image will be saved
         
         // Ensure the uploads directory exists
