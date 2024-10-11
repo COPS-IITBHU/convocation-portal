@@ -36,8 +36,15 @@ app.get('/api/available-rooms', async (req, res) => {
    }
 });
 
-app.post('/api/register', async (req, res) => {
-   const { name, branch, rollNumber, email, roomLocation, roomName, meal } = req.body;
+app.get('/api/register', async (req, res) => {
+   const name = req.query.name;
+   const branch = req.query.branch;
+   const rollNumber = req.query.rollNumber;
+   const email = req.query.email;
+   const roomLocation = req.query.roomLocation;
+   const roomName = req.query.roomName;
+   const meal = req.query.meal;
+
  
    try {
      // Check if an alum with the same roll number or email already exists
@@ -92,6 +99,17 @@ app.post('/api/register', async (req, res) => {
      return res.status(500).json({ message: 'Server error. Could not register alum.' });
    }
  });
+
+app.get('/api/reject', async (req, res) => {
+   const email = req.query.email;
+   const name = req.query.name;
+   const roomLocation = req.query.roomLocation;
+   const roomName = req.query.roomName;
+
+   sendRoomARejectionMail(email, name, roomLocation, roomName);
+   return res.status(200).json({ message: 'Rejection email sent successfully' });
+}
+);
  
 app.post('/api/initializelocations', async (req, res) => {
    try {
@@ -359,6 +377,7 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
                <p>Room: ${roomName}</p>
                <p>Thank you for registering with us!</p>`
    };
+   console.log('Sending email to:', email);
    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
          console.log(error);
@@ -368,7 +387,28 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
    });
 };
 
-const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber, imagePath) => {
+const sendRoomARejectionMail = async (email, name, roomLocation, roomName) => {
+   const mailOptions = {
+      from: 'noreply@yourdomain.com',
+      to: email,
+      subject: 'Room Allocation Rejection',
+      html: `<p>Your current request for the room allocation has been rejected</p>
+               <p>Name: ${name}</p> 
+               <p>Location: ${roomLocation}</p>
+               <p>Room: ${roomName}</p>
+               <p>Kindly reapply with the correct details</p>`
+   };
+   console.log('Sending email to:', email);
+   transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+         console.log(error);
+      } else {
+         console.log('Email sent: ' + info.response);
+      }
+   });
+};
+
+const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber, imagePath, meal, email) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
       to: 'shivansh111sid@gmail.com',
@@ -379,12 +419,14 @@ const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber,
                <p>Room: ${roomName}</p>
                <p>Branch: ${branch}</p>
                <p>Roll Number: ${rollNumber}</p>
+               <a href="http://localhost:5000/api/register?name=${encodeURIComponent(name)}&branch=${encodeURIComponent(branch)}&rollNumber=${encodeURIComponent(rollNumber)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&meal=${encodeURIComponent(meal)}&email=${encodeURIComponent(email)}">Click here to confirm</a>
+               <a href="http://localhost:5000/api/reject?name=${encodeURIComponent(name)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&email=${encodeURIComponent(email)}">Click here to reject</a>
                <img src="cid:screenshot"/>`,
-                  attachments: [{
-                     filename: 'screenshot.png',
-                     path: imagePath,
-                     cid: 'screenshot' // same cid value as in the html img src
-                  }]
+      attachments: [{
+         filename: 'screenshot.png',
+         path: imagePath,
+         cid: 'screenshot' // same cid value as in the html img src
+      }]
    };
    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -393,10 +435,20 @@ const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber,
          console.log('Email sent: ' + info.response);
       }
    });
+   // Remove the image from the uploads folder after 1 minute
+   setTimeout(() => {
+      fs.unlink(imagePath, (err) => {
+         if (err) {
+            console.error('Error deleting image:', err);
+         } else {
+            console.log('Image deleted successfully');
+         }
+      });
+   }, 60000);
 };
 
 app.post('/api/image-handling', async (req, res) => {
-   const { name, branch, rollNumber, roomLocation, roomName, base64String } = req.body;
+   const { name, branch, rollNumber, roomLocation, roomName, meal, base64String, email} = req.body;
    
    try {
       if (!base64String) {
@@ -425,7 +477,7 @@ app.post('/api/image-handling', async (req, res) => {
             imagePath: `/uploads/${imageName}`, // Correct the imagePath to be relative
           });
         });
-        sendMailToAdmin(name, roomLocation, roomName, branch, rollNumber, path.join(__dirname, 'uploads', imageName)); // Use absolute path for sending email
+        sendMailToAdmin(name, roomLocation, roomName, branch, rollNumber, path.join(__dirname, 'uploads', imageName), meal, email); // Use absolute path for sending email
       //   console.log(path.join(__dirname, 'uploads', imageName));
    } catch (error) {
       console.error('Error dealing with image:', error);
