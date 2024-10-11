@@ -58,3 +58,38 @@ export const handleRoomBooking = async (alumDetails: Alumni, roomLocation: strin
         return null;
     }
 };
+
+export const handleImage = async (alumDetails: Alumni, roomLocation: string, roomName: string, meal: boolean, base64String: string): Promise<any> => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/image-handling`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: alumDetails.name,
+                branch: alumDetails.branch,
+                rollNumber: alumDetails.rollNumber,
+                email: alumDetails.email,
+                roomLocation,
+                roomName,
+                meal,
+                base64String
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error booking room: ${response.statusText}`);
+        }
+
+        const bookingData = await response.json();
+        alumDetails.roomLocation = roomLocation;
+        alumDetails.roomName = roomName;
+        alumDetails.meal = meal;
+
+        return bookingData;
+    } catch (error) {
+        console.error('Error in room booking:', error);
+        return null;
+    }
+};
