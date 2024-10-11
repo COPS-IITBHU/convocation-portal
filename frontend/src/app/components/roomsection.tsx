@@ -20,7 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import { ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { RoomInfo, Alumni, Room } from '../types/types';
-import { getRoomDetails, handleRoomBooking, handleImage } from '../utils/roomutils';
+import { getRoomDetails, handleImage } from '../utils/roomutils';
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
