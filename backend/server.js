@@ -371,11 +371,19 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
       from: 'noreply@yourdomain.com',
       to: email,
       subject: 'Room Allocation Confirmation',
-      html: `<p>Your room allocation details are:</p>
-               <p>Name: ${name}</p> 
-               <p>Location: ${roomLocation}</p>
-               <p>Room: ${roomName}</p>
-               <p>Thank you for registering with us!</p>`
+      html: `
+         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
+            <h2 style="color: #4CAF50;">Room Allocation Confirmation</h2>
+            <p>Dear <strong>${name}</strong>,</p>
+            <p>Your room allocation details are as follows:</p>
+            <ul style="list-style-type: none; padding: 0;">
+               <li><strong>Location:</strong> ${roomLocation}</li>
+               <li><strong>Room Name:</strong> ${roomName}</li>
+            </ul>
+            <p>Thank you for registering with us. We look forward to welcoming you!</p>
+            <p>Best regards,<br>Your Support Team</p>
+         </div>
+      `
    };
    console.log('Sending email to:', email);
    transporter.sendMail(mailOptions, (error, info) => {
@@ -387,16 +395,24 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
    });
 };
 
-const sendRoomARejectionMail = async (email, name, roomLocation, roomName) => {
+const sendRoomRejectionEmail = async (email, name, roomLocation, roomName) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
       to: email,
       subject: 'Room Allocation Rejection',
-      html: `<p>Your current request for the room allocation has been rejected</p>
-               <p>Name: ${name}</p> 
-               <p>Location: ${roomLocation}</p>
-               <p>Room: ${roomName}</p>
-               <p>Kindly reapply with the correct details</p>`
+      html: `
+         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
+            <h2 style="color: #F44336;">Room Allocation Rejection</h2>
+            <p>Dear <strong>${name}</strong>,</p>
+            <p>We regret to inform you that your current request for room allocation has been rejected.</p>
+            <ul style="list-style-type: none; padding: 0;">
+               <li><strong>Location:</strong> ${roomLocation}</li>
+               <li><strong>Room Name:</strong> ${roomName}</li>
+            </ul>
+            <p>Please reapply with the correct details.</p>
+            <p>Best regards,<br>Your Support Team</p>
+         </div>
+      `
    };
    console.log('Sending email to:', email);
    transporter.sendMail(mailOptions, (error, info) => {
@@ -413,19 +429,35 @@ const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber,
       from: 'noreply@yourdomain.com',
       to: 'shivansh111sid@gmail.com',
       subject: 'Room Allocation Confirmation',
-      html: `<p>Please Verify The Room Details of the following Applicant:</p>
-               <p>Name: ${name}</p> 
-               <p>Location: ${roomLocation}</p>
-               <p>Room: ${roomName}</p>
-               <p>Branch: ${branch}</p>
-               <p>Roll Number: ${rollNumber}</p>
-               <a href="http://localhost:5000/api/register?name=${encodeURIComponent(name)}&branch=${encodeURIComponent(branch)}&rollNumber=${encodeURIComponent(rollNumber)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&meal=${encodeURIComponent(meal)}&email=${encodeURIComponent(email)}">Click here to confirm</a>
-               <a href="http://localhost:5000/api/reject?name=${encodeURIComponent(name)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&email=${encodeURIComponent(email)}">Click here to reject</a>
-               <img src="cid:screenshot"/>`,
+      html: `
+         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
+            <h2 style="color: #4CAF50;">Room Allocation Confirmation</h2>
+            <p>Please verify the room details for the following applicant:</p>
+            <ul style="list-style-type: none; padding: 0;">
+               <li><strong>Name:</strong> ${name}</li>
+               <li><strong>Location:</strong> ${roomLocation}</li>
+               <li><strong>Room:</strong> ${roomName}</li>
+               <li><strong>Branch:</strong> ${branch}</li>
+               <li><strong>Roll Number:</strong> ${rollNumber}</li>
+               <li><strong>Meal Preference:</strong> ${meal}</li>
+            </ul>
+            <p>
+               <a href="http://localhost:5000/api/register?name=${encodeURIComponent(name)}&branch=${encodeURIComponent(branch)}&rollNumber=${encodeURIComponent(rollNumber)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&meal=${encodeURIComponent(meal)}&email=${encodeURIComponent(email)}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+                  Confirm
+               </a>
+               <a href="http://localhost:5000/api/reject?name=${encodeURIComponent(name)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&email=${encodeURIComponent(email)}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #F44336; color: white; text-decoration: none; border-radius: 5px;">
+                  Reject
+               </a>
+            </p>
+            <p><img src="cid:screenshot" style="width: 100%; height: auto;" /></p>
+         </div>
+      `,
       attachments: [{
          filename: 'screenshot.png',
          path: imagePath,
-         cid: 'screenshot' // same cid value as in the html img src
+         cid: 'screenshot'
       }]
    };
    transporter.sendMail(mailOptions, (error, info) => {
@@ -435,7 +467,7 @@ const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber,
          console.log('Email sent: ' + info.response);
       }
    });
-   // Remove the image from the uploads folder after 1 minute
+
    setTimeout(() => {
       fs.unlink(imagePath, (err) => {
          if (err) {
