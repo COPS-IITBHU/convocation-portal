@@ -50,6 +50,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
     const [isToastOpen, setIsToastOpen] = useState(false);
     const [imageError, setImageError] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [isSuccessToastOpen, setIsSuccessToastOpen] = useState(false);
 
     const handleClickOpen = async (room: Room) => {
         setSelectedRoom(room);
@@ -105,7 +106,6 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
             }
         }
     };
-    
 
     const handleBookRoom = async () => {
         if (selectedRoom && details) {
@@ -119,13 +119,15 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
 
                 if (!bookingResponse) {
                     setError("You can only book one room at a time.");
+                    setIsToastOpen(true);
                 } else {
                     handleClose(); // Close the dialog after successful booking
-                    router.push('/home');
-                    return; // Exit the function after successful booking
+                    setIsSuccessToastOpen(true); // Show success toast
+                    setTimeout(() => {
+                        router.push('/home');
+                    }, 3000); // Redirect after 3 seconds
+                    return;
                 }
-
-                setIsToastOpen(true); // Show toast for errors
             } catch (error) {
                 console.error("Error during room booking:", error);
                 setError("Failed to book the room. Please try again.");
@@ -138,6 +140,10 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
         setIsToastOpen(false);
         setError(null);
         setImageError(null);
+    };
+
+    const handleCloseSuccessToast = () => {
+        setIsSuccessToastOpen(false);
     };
 
     useEffect(() => {
@@ -245,6 +251,13 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                 autoHideDuration={6000}
                 onClose={handleCloseToast}
                 message={error || imageError}
+            />
+
+            <Snackbar
+                open={isSuccessToastOpen}
+                autoHideDuration={6000}
+                onClose={handleCloseSuccessToast}
+                message="Please keep checking your college mail id and this site for further updates"
             />
         </Box>
     );
