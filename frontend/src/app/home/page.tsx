@@ -12,7 +12,9 @@ import {
   Alert,
   AlertTitle,
   useMediaQuery,
-  Paper
+  Paper,
+  CircularProgress,
+  Skeleton
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { LogOut, Info } from "lucide-react";
@@ -33,6 +35,8 @@ export default function Home() {
   const [partiallyoccupiedroomsdata, setPartiallyOccupiedRoomsData] = useState<RoomInfo[]>([]);
   const [error, setError] = useState('');
   const [isToastOpen, setIsToastOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const router = useRouter();
@@ -63,6 +67,7 @@ export default function Home() {
 
   const getRoomsData = async (): Promise<void> => {
     try {
+      setIsLoading(true);
       const unoccupiedroomsdata = await handleUnoccupiedRooms();
       const occupiedroomsdata = await handleOccupiedRooms();
       const partiallyoccupiedroomsdata = await handlePartiallyOccupiedRooms();
@@ -73,6 +78,8 @@ export default function Home() {
       console.error('Error fetching room data:', error);
       setError('Failed to fetch room data. Please try again later.');
       setIsToastOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,11 +87,12 @@ export default function Home() {
     const fetchAlumData = async () => {
       if (token) {
         try {
-          const userdetails = jwtDecode<{ 
-            name: string; 
-            branch: string; 
-            rollNumber: string; 
-            email: string; 
+          setIsUserDataLoading(true);
+          const userdetails = jwtDecode<{
+            name: string;
+            branch: string;
+            rollNumber: string;
+            email: string;
           }>(token);
   
           setAlumDetails((prev) => ({
@@ -94,7 +102,7 @@ export default function Home() {
             rollNumber: userdetails.rollNumber,
             email: userdetails.email,
           }));
-
+  
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/alum-room-info`,
             {
@@ -110,30 +118,40 @@ export default function Home() {
               }),
             }
           );
-
-          if (!response.ok) {
-            throw new Error('Failed to fetch room info');
+  
+          if (response.status !== 200 && response.status !== 404) {
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
-
-          const alumInfo = await response.json();
-          setRoomInfo({
-            roomName: alumInfo.roomName,
-            roomLocation: alumInfo.roomLocation,
-            meal: alumInfo.meal,
-          });
+  
+          if (response.status === 200) {
+            const alumInfo = await response.json();
+            setRoomInfo({
+              roomName: alumInfo.roomName,
+              roomLocation: alumInfo.roomLocation,
+              meal: alumInfo.meal,
+            });
+          } else if (response.status === 404) {
+            // Handle 404 case (e.g., no room booked yet)
+            setRoomInfo({
+              roomName: '',
+              roomLocation: '',
+              meal: false,
+            });
+          }
         } catch (error) {
           console.error('Error fetching alum details or room info:', error);
           setError('Failed to fetch alum details or room info. Please try again later.');
           setIsToastOpen(true);
+        } finally {
+          setIsUserDataLoading(false);
         }
       } else {
         router.push('/');
       }
     };
-
+  
     fetchAlumData();
     getRoomsData();
-  
   }, [token, router]);
 
   return (
@@ -243,17 +261,25 @@ export default function Home() {
               alignItems: isSmallScreen ? 'flex-start' : 'center', 
               gap: 2 
             }}>
-              <Box textAlign={isSmallScreen ? 'left' : 'right'}>
-                <Typography variant="subtitle1" sx={{ color: '#1a237e', fontWeight: '500' }}>
-                  {alumDetails.name}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#303f9f' }}>
-                  {alumDetails.branch}
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#303f9f', wordBreak: 'break-word' }}>
-                  {alumDetails.email}
-                </Typography>
-              </Box>
+              {isUserDataLoading ? (
+                <Box>
+                  <Skeleton variant="text" width={150} />
+                  <Skeleton variant="text" width={100} />
+                  <Skeleton variant="text" width={200} />
+                </Box>
+              ) : (
+                <Box textAlign={isSmallScreen ? 'left' : 'right'}>
+                  <Typography variant="subtitle1" sx={{ color: '#1a237e', fontWeight: '500' }}>
+                    {alumDetails.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#303f9f' }}>
+                    {alumDetails.branch}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#303f9f', wordBreak: 'break-word' }}>
+                    {alumDetails.email}
+                  </Typography>
+                </Box>
+              )}
               <Button
                 variant="contained"
                 color="primary"
@@ -284,23 +310,33 @@ export default function Home() {
             }}
           >
             <AlertTitle>Your Current Booking</AlertTitle>
-            <Typography>
-              {roomInfo.roomLocation} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
-            </Typography>
+            {isUserDataLoading ? (
+              <Skeleton variant="text" width={300} />
+            ) : (
+              <Typography>
+                {roomInfo.roomLocation} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
+              </Typography>
+            )}
           </Alert>
 
           {/* Room Sections Wrapped in Boxes */}
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ mb: 2 }}>
-              <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <CircularProgress />
             </Box>
-            <Box sx={{ mb: 2 }}>
-              <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ mb: 2 }}>
+                <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
+              </Box>
             </Box>
-            <Box sx={{ mb: 2 }}>
-              <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
-            </Box>
-          </Box>
+          )}
         </Paper>
       </Container>
 

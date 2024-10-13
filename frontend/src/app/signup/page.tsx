@@ -13,13 +13,13 @@ import {
   MenuItem,
   Box,
   Paper,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-// import copsLogo from '../assets/COPS_LOGO (1).png';
 import sntcLogo from '../assets/image.png';
 import IITBHULOGO from '../assets/image (1).png';
 
@@ -27,6 +27,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isToastOpen, setIsToastOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     name: '',
@@ -56,6 +57,7 @@ export default function SignUp() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, {
         method: 'POST',
@@ -78,8 +80,26 @@ export default function SignUp() {
       console.error('Error during registration:', error);
       setError('Something went wrong. Please try again later.');
       setIsToastOpen(true);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        }}
+      >
+        <CircularProgress size={60} thickness={4} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -150,7 +170,6 @@ export default function SignUp() {
         </Box>
       </Box>
 
-      {/* Welcome Text */}
       <Typography
         variant="h3"
         sx={{
@@ -236,8 +255,6 @@ export default function SignUp() {
               <MenuItem value="Pharmaceutical Engineering">Pharmaceutical Engineering</MenuItem>
               <MenuItem value="School of Material Sciences and Technology">School of Material Sciences and Technology</MenuItem>
               <MenuItem value="Architecture Planning and Design">Architecture Planning and Design</MenuItem>
-              {/* <MenuItem value="" */}
-
             </Select>
           </FormControl>
 
@@ -281,6 +298,7 @@ export default function SignUp() {
             color="primary" 
             fullWidth 
             type="submit"
+            disabled={isLoading}
             sx={{
               padding: '0.75rem',
               marginBottom: '1rem',
@@ -290,7 +308,7 @@ export default function SignUp() {
               },
             }}
           >
-            Sign Up
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
           </Button>
 
           <Typography sx={{ textAlign: 'center', color: '#666' }}>
@@ -307,25 +325,21 @@ export default function SignUp() {
             </a>
           </Typography>
           <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '2rem',
-          marginTop:'2rem',
-          marginBottom: '0.5rem',
-          width: '100%',
-          maxWidth: '800px',
-        }}
-      >
-        Made with ❤️ by COPS
-      </Box>
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '2rem',
+              marginTop:'2rem',
+              marginBottom: '0.5rem',
+              width: '100%',
+              maxWidth: '800px',
+            }}
+          >
+            Made with ❤️ by COPS
+          </Box>
         </form>
-        
       </Paper>
-      
-
     </Box>
-    
   );
 }
