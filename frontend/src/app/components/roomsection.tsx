@@ -24,6 +24,8 @@ import { getRoomDetails, handleImage } from '../utils/roomutils';
 import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
+import upi from '../assets/upi.png';
+import Image from 'next/image';
 
 const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[] }) => {
     const router = useRouter();
@@ -206,7 +208,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                             </Typography>
                             <Box display="flex" alignItems="center" mt={2}>
                                 <Typography variant="body1" color="text.secondary" sx={{ mr: 2 }}>
-                                    {isMess ? "Mess" : "No Mess"}
+                                    {isMess ? "Mess opted" : "Mess not opted"}
                                 </Typography>
                                 <Switch
                                     checked={isMess}
@@ -215,7 +217,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                                     inputProps={{ 'aria-label': 'toggle mess preference' }}
                                 />
                             </Box>
-
+                            <Image src={upi} alt="UPI QR Code" height={80}/>
                             {/* Image Upload Section */}
                             <Box mt={2}>
                                 <Typography variant="body2" color="text.secondary">

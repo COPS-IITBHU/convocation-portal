@@ -30,14 +30,16 @@ export default function RootLayout({
         {children}
         <footer className="bg-gray-100 border-t border-gray-300 py-4">
           <div className="container mx-auto text-center">
-            <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
-            <p className="text-gray-700"><strong>Name:</strong>Shivansh Bhatnagar</p>
+            <h3 className="text-lg font-semibold mb-2 text-black">Contact Information</h3>
+            <p className="text-gray-700"><strong>Name:</strong> Office of Chairman Council of Wardens</p>
+            {/* <p className="text-gray-700"><strong>Name:</strong> Office of Chairman Council of Wardens</p> */}
+            <p className="text-gray-700">IIT (BHU) Varnasi</p>
             <p className="text-gray-700">
-              <strong>Email:</strong> <a href="mailto:.bhatnagar.mat22@itbhu.ac.in" className="text-blue-500 hover:underline">shivansh.bhatnagar.mat22@itbhu.ac.in</a>
+              <strong>Email:</strong> <a href="mailto:office.cow@iitbhu.ac.in" className="text-blue-500 hover:underline">office.cow@iitbhu.ac.in</a>
             </p>
-            <p className="text-gray-700">
+            {/* <p className="text-gray-700">
               <strong>Phone:</strong> <a href="tel:+91-7905368968" className="text-blue-500 hover:underline">+91-7905368968</a>
-            </p>
+            </p> */}
           </div>
         </footer>
       </body>

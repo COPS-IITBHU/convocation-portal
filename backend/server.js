@@ -395,7 +395,7 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
    });
 };
 
-const sendRoomRejectionEmail = async (email, name, roomLocation, roomName) => {
+const sendRoomARejectionMail = async (email, name, roomLocation, roomName) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
       to: email,
@@ -409,7 +409,7 @@ const sendRoomRejectionEmail = async (email, name, roomLocation, roomName) => {
                <li><strong>Location:</strong> ${roomLocation}</li>
                <li><strong>Room Name:</strong> ${roomName}</li>
             </ul>
-            <p>Please reapply with the correct details.</p>
+            <p>Please reapply with the correct details or payement info</p>
             <p>Best regards,<br>Your Support Team</p>
          </div>
       `
@@ -427,7 +427,7 @@ const sendRoomRejectionEmail = async (email, name, roomLocation, roomName) => {
 const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber, imagePath, meal, email) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
-      to: 'shivansh111sid@gmail.com',
+      to: ' office.cow@iitbhu.ac.in',
       subject: 'Room Allocation Confirmation',
       html: `
          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
