@@ -370,6 +370,7 @@ const sendRoomAllocationEmail = async (email, name, roomLocation, roomName) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
       to: email,
+      cc: 'office.cow@iitbhu.ac.in',
       subject: 'Room Allocation Confirmation',
       html: `
          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
@@ -427,7 +428,7 @@ const sendRoomARejectionMail = async (email, name, roomLocation, roomName) => {
 const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber, imagePath, meal, email) => {
    const mailOptions = {
       from: 'noreply@yourdomain.com',
-      to: ' office.cow@iitbhu.ac.in',
+      to: 'office.cow@iitbhu.ac.in',
       subject: 'Room Allocation Confirmation',
       html: `
          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
