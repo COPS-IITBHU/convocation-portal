@@ -324,6 +324,18 @@ export default function SignUp() {
               Sign In
             </a>
           </Typography>
+          {/* <br></br> */}
+          <Typography sx={{ textAlign: 'left', color: '#666', marginTop: '1rem' }}>
+            Instructions :
+            </Typography>
+            <Typography sx={{ textAlign: 'left', color: '#000', fontWeight: '300', fontSize: '0.75rem' }}>
+                <ul className={"list-disc list-outside"}>
+                <li> Please SignUp and fill your details for the first time. Kindly use your institute email id for registration.</li>
+                <li> Last Date to fill the details for accommodation is 21st October 2024 till 5 PM.</li>
+                <li> Accommodation is available from 26th-29th October, 2024 on a chargeable basis. The charges are Rs. 250/bed for Hostel Rooms and 150/bed for Common Rooms.</li>
+                <li> As limited hostel rooms are available, accommodation will be provided on a first come first serve basis.</li>
+                </ul>
+            </Typography>
           <Box
             sx={{
               display: 'flex',
