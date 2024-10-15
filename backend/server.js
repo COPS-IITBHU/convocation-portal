@@ -116,7 +116,7 @@ app.post('/api/initializelocations', async (req, res) => {
       await locationSchema.deleteMany({});
       const predefinedLocations = [
          {
-            locationName: 'Common Rooms (Boys)',
+            locationName: 'Common Rooms (Boys) [150/- per bed]',
             rooms: [
                { roomName: 'C.V. Raman Hostel', capacity: 40, occupants: [] },
                { roomName: 'Morvi Hostel', capacity: 40, occupants: [] },
@@ -132,7 +132,7 @@ app.post('/api/initializelocations', async (req, res) => {
             ]
          },
          {
-            locationName: 'Normal Rooms (Boys)',
+            locationName: 'Rooms (Boys) [250/- per bed]',
             rooms: [
                { roomName: 'Morvi Hostel', capacity: 160, occupants: [] },
                { roomName: 'Dhanrajgiri Hostel', capacity: 36, occupants: [] },
@@ -144,7 +144,7 @@ app.post('/api/initializelocations', async (req, res) => {
             ]
          },
          {
-            locationName: 'Common Rooms (Girls)',
+            locationName: 'Common Rooms (Girls) [150/- per bed]',
             rooms: [
                { roomName: 'Limbdi Hostel', capacity: 40, occupants: [] },
                { roomName: 'S.C. Dey Hostel', capacity: 40, occupants: [] },
@@ -447,11 +447,11 @@ const sendMailToAdmin = async (name, roomLocation, roomName, branch, rollNumber,
                <li><strong>Meal Preference:</strong> ${meal}</li>
             </ul>
             <p>
-               <a href="http://localhost:5000/api/register?name=${encodeURIComponent(name)}&branch=${encodeURIComponent(branch)}&rollNumber=${encodeURIComponent(rollNumber)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&meal=${encodeURIComponent(meal)}&email=${encodeURIComponent(email)}" 
+               <a href="http://convocation-portal.onrender.com/api/register?name=${encodeURIComponent(name)}&branch=${encodeURIComponent(branch)}&rollNumber=${encodeURIComponent(rollNumber)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&meal=${encodeURIComponent(meal)}&email=${encodeURIComponent(email)}" 
                style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
                   Confirm
                </a>
-               <a href="http://localhost:5000/api/reject?name=${encodeURIComponent(name)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&email=${encodeURIComponent(email)}" 
+               <a href="http://convocation-portal.onrender.com/api/reject?name=${encodeURIComponent(name)}&roomLocation=${encodeURIComponent(roomLocation)}&roomName=${encodeURIComponent(roomName)}&email=${encodeURIComponent(email)}" 
                style="display: inline-block; padding: 10px 20px; background-color: #F44336; color: white; text-decoration: none; border-radius: 5px;">
                   Reject
                </a>

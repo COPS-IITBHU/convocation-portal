@@ -309,12 +309,12 @@ export default function Home() {
               }
             }}
           >
-            <AlertTitle>Your Current Booking</AlertTitle>
+            <AlertTitle>Your Current Booking [26th - 29th October, 2024]</AlertTitle>
             {isUserDataLoading ? (
               <Skeleton variant="text" width={300} />
             ) : (
               <Typography>
-                {roomInfo.roomLocation} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
+                {roomInfo.roomLocation ? roomInfo.roomLocation : 'N/A'} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
               </Typography>
             )}
           </Alert>
@@ -327,13 +327,13 @@ export default function Home() {
           ) : (
             <Box sx={{ mb: 3 }}>
               <Box sx={{ mb: 2 }}>
-                <RoomSection title="Unoccupied Rooms" roomsInfo={unoccupiedroomsdata} />
+                <RoomSection title="Unoccupied Rooms / Common Rooms" roomsInfo={unoccupiedroomsdata} />
               </Box>
               <Box sx={{ mb: 2 }}>
-                <RoomSection title="Partially Occupied Rooms" roomsInfo={partiallyoccupiedroomsdata} />
+                <RoomSection title="Partially Occupied Rooms / Common Rooms" roomsInfo={partiallyoccupiedroomsdata} />
               </Box>
               <Box sx={{ mb: 2 }}>
-                <RoomSection title="Occupied Rooms" roomsInfo={occupiedroomsdata} />
+                <RoomSection title="Occupied Rooms / Common Rooms" roomsInfo={occupiedroomsdata} />
               </Box>
             </Box>
           )}
