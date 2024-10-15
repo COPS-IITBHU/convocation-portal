@@ -120,23 +120,27 @@ app.post('/api/initializelocations', async (req, res) => {
             rooms: [
                { roomName: 'C.V. Raman Hostel', capacity: 40, occupants: [] },
                { roomName: 'Morvi Hostel', capacity: 40, occupants: [] },
-               { roomName: 'Dhanrajgiri Hostel', capacity: 64, occupants: [] },
+               { roomName: 'Dhanrajgiri Hostel', capacity: 84, occupants: [] },
                { roomName: 'Rajputana Hostel', capacity: 40, occupants: [] },
                { roomName: 'Vivekananda Hostel', capacity: 40, occupants: [] },
                { roomName: 'Vishwakarma Hostel', capacity: 40, occupants: [] },
-               { roomName: 'Vishweshwaraiya Hostel', capacity: 100, occupants: [] },
-               { roomName: 'A.S.N. Bose Hostel', capacity: 24, occupants: [] },
-               { roomName: 'Satish Dhawan Hostel', capacity: 100, occupants: [] },
-               { roomName: 'P.C. Ray Hostel', capacity: 150, occupants: [] },
+               { roomName: 'Vishweshwaraiya Hostel', capacity: 150, occupants: [] },
+               { roomName: 'Ramanujan Hostel', capacity: 75, occupants: [] },
+               { roomName: 'Aryabhatta Hostel', capacity: 250, occupants: [] },
+               { roomName: 'Satish Dhawan Hostel', capacity: 180, occupants: [] },
+               { roomName: 'P.C. Ray Hostel', capacity: 206, occupants: [] },
             ]
          },
          {
             locationName: 'Normal Rooms (Boys)',
             rooms: [
-               { roomName: 'Morvi Hostel', capacity: 200, occupants: [] },
+               { roomName: 'Morvi Hostel', capacity: 160, occupants: [] },
                { roomName: 'Dhanrajgiri Hostel', capacity: 36, occupants: [] },
                { roomName: 'Vivekananda Hostel', capacity: 60, occupants: [] },
+               { roomName: 'Vishwakarma Hostel', capacity: 60, occupants: [] },
                { roomName: 'A.S.N. Bose Hostel', capacity: 36, occupants: [] },
+               { roomName: 'P.C. Ray Hostel', capacity: 44, occupants: [] },
+               { roomName: 'C. V. Raman', capacity: 44, occupants: [] }
             ]
          },
          {
@@ -144,8 +148,8 @@ app.post('/api/initializelocations', async (req, res) => {
             rooms: [
                { roomName: 'Limbdi Hostel', capacity: 40, occupants: [] },
                { roomName: 'S.C. Dey Hostel', capacity: 40, occupants: [] },
-               { roomName: 'G.S.M.C. Hostel', capacity: 100, occupants: [] },
-               { roomName: 'Nivedita Hostel', capacity: 100, occupants: [] },
+               { roomName: 'G.S.M.C. Hostel', capacity: 150, occupants: [] },
+               { roomName: 'Nivedita Hostel', capacity: 125, occupants: [] },
             ]
          },
       ];

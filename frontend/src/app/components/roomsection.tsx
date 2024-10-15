@@ -217,7 +217,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                                     inputProps={{ 'aria-label': 'toggle mess preference' }}
                                 />
                             </Box>
-                            <Image src={upi} alt="UPI QR Code" height={80}/>
+                            <Image src={upi} alt="UPI QR Code"/>
                             {/* Image Upload Section */}
                             <Box mt={2}>
                                 <Typography variant="body2" color="text.secondary">
