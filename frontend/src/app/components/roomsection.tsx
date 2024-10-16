@@ -221,7 +221,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                             {/* Image Upload Section */}
                             <Box mt={2}>
                                 <Typography variant="body2" color="text.secondary">
-                                    Upload an image (only .png, .jpeg, .jpg):
+                                    Upload an image (only .png, .jpeg, .jpg) [max. 100 kB]:
                                 </Typography>
                                 <input
                                     accept="image/png, image/jpeg, image/jpg"
@@ -229,6 +229,11 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                                     onChange={handleFileChange}
                                     style={{ marginTop: '10px' }}
                                 />
+                                {selectedImage && selectedImage.size > 100 * 1024 && (
+                                    <Typography color="error" variant="body2" mt={1}>
+                                        File size should be less than 100 kB.
+                                    </Typography>
+                                )}
                                 {imageError && (
                                     <Typography color="error" variant="body2" mt={1}>
                                         {imageError}
