@@ -75,8 +75,8 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
     const handleClose = () => {
         setOpen(false);
         setSelectedRoom(null);
-        setDetails(null); 
-        setIsMess(false); 
+        setDetails(null);
+        setIsMess(false);
         setSelectedImage(null);
         setImageError(null);
     };
@@ -85,26 +85,131 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
         setIsMess(event.target.checked);
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Define max dimensions and quality
+    const MAX_WIDTH = 700;
+    const MAX_HEIGHT = 700;
+    const QUALITY = 0.7;
+
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const originalReader = new FileReader();
+            originalReader.readAsDataURL(file);
+            
+            originalReader.onload = (originalEvent) => {
+                const originalBase64 = originalEvent.target?.result as string;
+                
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                
+                reader.onload = (event) => {
+                    const img: HTMLImageElement = document.createElement('img');
+                    img.src = event.target?.result as string;
+                    
+                    img.onload = () => {
+                        // Only resize if the image is larger than max dimensions
+                        let width = img.width;
+                        let height = img.height;
+                        let shouldResize = false;
+                        
+                        if (width > MAX_WIDTH) {
+                            height = (MAX_WIDTH * height) / width;
+                            width = MAX_WIDTH;
+                            shouldResize = true;
+                        }
+                        if (height > MAX_HEIGHT) {
+                            width = (MAX_HEIGHT * width) / height;
+                            height = MAX_HEIGHT;
+                            shouldResize = true;
+                        }
+                        
+                        if (!shouldResize && file.size < 500000) { // Less than 500KB
+                            resolve(originalBase64);
+                            return;
+                        }
+                        
+                        const canvas: HTMLCanvasElement = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        
+                        if (!ctx) {
+                            reject(new Error('Failed to get canvas context'));
+                            return;
+                        }
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        let outputFormat = file.type;
+                        let compressedBase64 = '';
+                        let bestQuality = QUALITY;
+                        
+                        if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                            const qualities = [0.8, 0.7, 0.6];
+                            for (const q of qualities) {
+                                const tempBase64 = canvas.toDataURL(outputFormat, q);
+                                if (tempBase64.length < originalBase64.length) {
+                                    compressedBase64 = tempBase64;
+                                    bestQuality = q;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // For PNG, just use original quality
+                            compressedBase64 = canvas.toDataURL(outputFormat, QUALITY);
+                        }
+                        
+                        // Use the smaller version
+                        if (compressedBase64 && compressedBase64.length < originalBase64.length) {
+                            resolve(compressedBase64);
+                        } else {
+                            resolve(originalBase64);
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        reject(new Error('Failed to load image'));
+                    };
+                };
+                
+                reader.onerror = () => {
+                    reject(new Error('Failed to read file'));
+                };
+            };
+        });
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        
         if (file) {
             const fileType = file.type;
             const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    
+            
             if (!allowedTypes.includes(fileType)) {
                 setImageError("Only .png, .jpeg, and .jpg files are allowed.");
                 setSelectedImage(null);
-            } else {
+                setBase64String("");
+                return;
+            }
+            
+            try {
                 setImageError(null);
                 setSelectedImage(file);
-    
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const base64String = reader.result as string;
-                    setBase64String(base64String)
-                    console.log('Base64 Image String:', base64String);
-                };
-                reader.readAsDataURL(file);
+                
+                // Compress and convert to base64
+                const compressedBase64 = await compressImage(file);
+                setBase64String(compressedBase64);
+                
+                // Log size comparison
+                const originalSize = file.size;
+                const compressedSize = Math.round((compressedBase64.length * 3) / 4);
+                console.log('Original size:', Math.round(originalSize / 1024), 'KB');
+                console.log('Compressed size:', Math.round(compressedSize / 1024), 'KB');
+                console.log('Compression ratio:', Math.round((compressedSize / originalSize) * 100), '%');
+                
+            } catch (error) {
+                setImageError("Error processing image. Please try again.");
+                console.error('Error:', error);
             }
         }
     };
@@ -123,11 +228,11 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                     setError("The image size is too big or invalid. Please try again.");
                     setIsToastOpen(true);
                 } else {
-                    handleClose(); // Close the dialog after successful booking
-                    setIsSuccessToastOpen(true); // Show success toast
+                    handleClose();
+                    setIsSuccessToastOpen(true);
                     setTimeout(() => {
                         router.push('/home');
-                    }, 3000); // Redirect after 3 seconds
+                    }, 3000);
                     return;
                 }
             } catch (error) {
@@ -218,7 +323,6 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                                 />
                             </Box>
                             <Image src={upi} alt="UPI QR Code"/>
-                            {/* Image Upload Section */}
                             <Box mt={2}>
                                 <Typography variant="body2" color="text.secondary">
                                     Upload an image (only .png, .jpeg, .jpg) [max. 100 kB]:
