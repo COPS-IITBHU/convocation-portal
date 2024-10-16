@@ -312,10 +312,12 @@ export default function Home() {
             <AlertTitle>Your Current Booking [26th - 29th October, 2024]</AlertTitle>
             {isUserDataLoading ? (
               <Skeleton variant="text" width={300} />
-            ) : (
+            ) : ( <>
               <Typography>
                 {roomInfo.roomLocation ? roomInfo.roomLocation : 'N/A'} - Room {roomInfo.roomName} {roomInfo.meal ? '(mess included)' : '(mess not included)'}
               </Typography>
+              {roomInfo.roomLocation ? <Typography></Typography> : <Typography> [Keep checking your mails for further confirmation] </Typography>}
+              </>
             )}
           </Alert>
 

@@ -264,7 +264,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                 open={isSuccessToastOpen}
                 autoHideDuration={6000}
                 onClose={handleCloseSuccessToast}
-                message="Please keep checking your college mail inbox and this site for further updates"
+                message="Your request has been submitted. Please keep checking your college mail inbox and this site for further updates"
             />
         </Box>
     );
