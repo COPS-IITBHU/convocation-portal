@@ -120,7 +120,7 @@ const RoomSection = ({ title, roomsInfo }: { title: string; roomsInfo: RoomInfo[
                 const bookingResponse = await handleImage(alumDetails, details.roomLocation, details.roomName, isMess, base64String);
 
                 if (!bookingResponse) {
-                    setError("You can only book one room at a time.");
+                    setError("The image size is too big or invalid. Please try again.");
                     setIsToastOpen(true);
                 } else {
                     handleClose(); // Close the dialog after successful booking
