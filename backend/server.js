@@ -522,7 +522,15 @@ app.post('/api/image-handling', async (req, res) => {
    }
 });
 
-
+app.get('/api/remove-user/:id', async (req, res) => {
+   const userId = req.params.id;
+   try {
+      await User.findByIdAndDelete(userId);
+      res.status(200).json({ message: 'User removed successfully' });
+   } catch (error) {
+      res.status(500).json({ message: 'Could not remove user' });
+   }
+});
 
 app.listen(5000, () => {
    console.log('Server running on port 5000');
