@@ -361,6 +361,17 @@ app.get('/api/clean-users', async (req, res) => {
       res.status(500).json({ message: 'Could not clean users' });
    }
 });
+
+app.get('/api/nonalum-users', async (req, res) => {
+   try {
+      const alums = await Alum.find();
+      const alumEmails = alums.map(alum => alum.email);
+      const nonAlumUsers = await User.find({ email: { $nin: alumEmails } });
+      res.status(200).json(nonAlumUsers);
+   } catch (error) {
+      res.status(500).json({ message: 'Could not fetch non-alum users' });
+   }
+});
  
 const transporter = nodemailer.createTransport({
    service: 'gmail',
